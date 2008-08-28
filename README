@@ -260,7 +260,7 @@ operations such as flashing an image etc.. and ease up things a lot more]
 ========================
 . (Source Root. All final executables are generated here)
 |-- COPYING (Copy Right file ->READ THIS)
-|-- README.txt (This file)
+|-- README (This file)
 |-- docs (documentation Directory)
 |   |-- app_pserial.dox
 |   |-- app_ucmd.dox
