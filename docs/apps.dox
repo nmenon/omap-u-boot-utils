@@ -1,0 +1,10 @@
+/**
+@page ub_apps Applications in U-Boot Utilities
+U-Boot utilities provide the following apps:
+@li @subpage ub_pserial - OMAP specific utility which downloads a file in
+ response to ASIC ID over serial port.
+@li @subpage ub_pusb - OMAP specific utility which downloads a file in
+ response to ASIC ID over USB connection.
+@li @subpage ub_ucmd - Send a command to U-Boot and wait till a specific match appears.
+@li @subpage ub_ukermit - Download a file from host without using kermit to U-Boot.
+*/

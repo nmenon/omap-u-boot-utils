@@ -1,0 +1,305 @@
++----------------------------------------------------------------------------+
+|         Welcome to Utils for U-Boot Utilities for OMAP!                    |
++----------------------------------------------------------------------------+
+
+========
+ Dated 27 Aug 2008 - Nishanth Menon
+========
++----------------------------------------------------------------------------+
+Table of Contents:
+=================
+0) CAVEATS
+1) COMPILATION Environment
+2) COMPILING the code
+3) pserial help
+4) ukermit help
+5) ucmd help
+6) ucmd help
+7) Generic Example of usage
+8) Files and Directories
+9) Credits
++----------------------------------------------------------------------------+
+
+IMPORTANT NOTE: This document is meant for folks who dont have generated
+documentation and need to see how it all works. However, this doc does get
+ outdated pretty fast.. so take this as a generic directions.
+if you would like the latest. do a 'make docs' and look at
+documentation in docs/html/index.html file
+
+0) CAVEATS
+==========
+Before using any tools, I would love to know it's limitations, hence the
+section 0 ;). some of the known caveats at the time of writing are:
+a) USB2serial convertors and pserial dont like each other on Linux
+b) pusb does not yet work on windows. This is still a work in progress
+c) ukermit is cranky when used with large packets - it is disabled at the moment
+
+1) COMPILATION Environment:
+===========================
+To get documentation run 'make docs'. You need doxygen and graphviz in your path
+for this to work. Documentation generation has been tried in linux only.
+
+Linux:
+------
+A) Get the Environment:
+----------------------
+Based on which ever distribution you have, you would need gcc, make,
+binutils, libc
+
+You could run "apt-get install gcc" or "yum install gcc" based on debian or
+redhat distribution
+
+NOTE: to make documentation, you'd need doxygen, graphviz, dot, latex,
+pdflatex, makeindex and related packages
+
+Windows:
+-------
+A)Get the Environment:
+----------------------
+NOTE: based on the speed of your internet connection and machine speed, these
+steps could take quite a while.. So dont blame me ;). I have just tried these
+on a 32 bit Windows XP machine, so no guarentees on 64 bit or Windows
+Vista,2000,95 and whatever is around..
+
+I) Compiler: http://www.mingw.org/
+ i) Download automated installer from:
+ http://sourceforge.net/project/showfiles.php?group_id=2435&package_id=240780
+ ii) Select gcc from options provided to <compiler directory>
+     Example: C:\MinGW
+	<compiler directory> = C:\MingW
+II) Get compilation environment: http://gnuwin32.sourceforge.net/
+ you can install individual packages from
+http://gnuwin32.sourceforge.net/packages.html OR go for the entire package by
+doing the following steps:
+ i) Run the getGNUWin32 application to download and install from:
+   http://sourceforge.net/project/showfiles.php?group_id=163416&package_id=184724
+ ii) Select the location to install the applications to <tmp directory>
+    Example: c:\gnuWinTemp
+ iii) Click on windows start->run "cmd"
+ iv) cd to C:\gnuWinTemp\GetGnuWin32\
+ v) If you have a net proxy to set, this would be the time to do it. e.g. for
+    http proxy(proxy.com) running on port 80, run:
+    set http_proxy=http://proxy.com:80
+    Note: NO QUOTES. Dont try 'set http_proxy="http://proxy.com:80"'.
+    Things are a bit brain dead and takes '"' as part of the variable.
+ vi) Setup the mirrors:
+   Example: set GNUWIN32_MIRROR="voxel umn unc"
+	(Yes with the '"'s)
+   Note: if you want to see the available mirrors run 'notepad readme.txt'
+ vii) Run the command "download" -> This will take a while all the apps are
+   pulled down, but, what the heck, you get all the apps :).
+   Note: if you do not desire to install all, read the readme.txt on how to
+   select the packages you'd need to install
+ viii) Run the command "install" -> This again could take a while
+ ix) now open a windows explorer window (windows key+e) and move the directory
+	<temp directory> to <app directory>. Example:
+	C:\gnuWinTemp\GetGnuWin32\gnuwin32 to c:\gnuwin32
+	directory c:\gnuWinTemp can now be deleted (if you would like to save some
+    disk space)
+	<app directory> = c:\gnuwin32
+III) setup the environment variables
+ i) Right click on system and select "System Properties"
+ ii) Click on "Advanced" Tab
+ iii) Click on the "Environment Variable" button
+ iv) Add <app directory>\bin and <compiler directory>\bin to the Path
+     variable (it is in System variable).
+	Example: c:\gnuwin32\bin;C:\MinGW\bin
+
+B) Additional params for building code for Windows
+--------------------------------------------------
+You can choose where the make,gcc are taken in windows compilation:
+i) Using variables to compile
+   Example:
+		set COMPILER_PREFIX=C:\MingW\bin\
+		set APP_PREFIX=C:\gnuwin32\bin\
+		make
+
+ii) Edit the Makefile and change the COMPILER_PREFIX and APP_PREFIX variables
+to point to where the files are present.
+
+To Compile code open a new command prompt by running "cmd" from start->run
+cd to the code and do a make
+
+2) COMPILING the code:
+======================
+* 'make docs' will generate the documentation.
+* 'make' will compile all binaries except pusb
+* 'make usb' will generate pusb as there is a dependency on libusb and OS
+   compiled on.
+* 'make clean' and 'make distclean' will cleanup all temporary files as required.
+
+By default, code builds in quiet mode, by setting variable V=1 during compile,
+you can get detailed build steps:
+  Example: make V=1
+
+NOTE: make docs requires graphviz, doxygen packages
+
+3) pserial help
+===============
+This Application helps download a second file as response to ASIC ID over
+serial port
+
+Syntax:
+------
+./pserial -p portName -f fileToDownload
+
+Where:
+-----
+portName - RS232 device being used. Example: Linux: /dev/ttyS0, Windows:
+           COM1,COM2 etc.
+fileToDownload - file to be downloaded as response to asic id
+
+Usage Example:
+-------------
+Linux: ./pserial -p /dev/ttyS0 -f ~/tmp/u-boot.bin
+Windows: pserial -p COM1 -f z:\tmp\u-boot.bin
+
+4) ukermit help
+===============
+This Application helps download a fileusing U-Boot's kermit protocol over
+serial port
+
+Syntax:
+------
+./ukermit -p portName -f fileToDownload [-d delay_time]
+
+Where:
+-----
+portName - RS232 device being used. Example: Linux: /dev/ttyS0, Windows:
+           COM1,COM2 etc.
+fileToDownload - file to be downloaded
+delay_time - delay in ms b/w each packet transmission and ack
+
+Usage Example:
+-------------
+Linux: ./ukermit -p /dev/ttyS0 -f ~/tmp/u-boot.bin
+Windows: ukermit -p COM1 -f z:\tmp\u-boot.bin
+
+5) ucmd help
+============
+This sends a command and expects a provided matching response from target
+
+Syntax:
+------
+./ucmd -p portName -c "command to send" -e "Expect String"
+
+Where:
+-----
+portName - RS232 device being used. Example: Linux: /dev/ttyS0, Windows:
+           COM1,COM2 etc.
+command to send - Command to send to uboot
+Expect string - String to expect from target - on match the
+application returns
+
+Usage Example:
+-------------
+Linux: ./ucmd -p /dev/ttyS0 -c "help" -e "U-Boot>"
+Windows: ucmd -p COM1 -c "help" -e "U-Boot>"
+
+6) pusb help
+============
+This Application helps download a second file as response to ASIC ID over USB
+
+Syntax:
+------
+  ./pusb [-v] [-d device_ID] -f input_file
+Where:
+-----
+   -v          : (optional) Chitter chatter verbose
+   -q          : (optional) Ultra quiet - no outputs other than error
+   -d device_ID: (optional) USB Device id (Uses default of 0xD009)
+   -f input_file: input file to be transmitted to target
+NOTE: it is required to run this program in sudo mode to get access at times
+
+7) Generic Example of usage
+===========================
+The following example is using U-Boot-V2. But it is not restricted to just
+that! My notes in [NOTE:] comments below
+
+$ ./pserial -p /dev/ttyS1 -f ../u-serial.bin
+[NOTE: this will wait for ASIC ID -> So I switch on/reset the board after
+this]
+Waiting For Device ASIC ID: Press Ctrl+C to stop
+ASIC ID Detected.
+Sending 2ndFile:
+Downloading file: 100.000% completed(35108/35108 bytes)
+File download completed.
+
+$ ./ucmd -p /dev/ttyS1 -c "loadb -f /dev/ram0" -e 'bps...'
+[NOTE: run the loadb command to load to memory.. loadb command ends with bps..
+to show it is waiting for a file to be send from host]
+Output:
+loadb -f /dev/ram0
+## Ready for binary (kermit) download to 0x00000000 offset on /dev/ram0 device
+at 115200 bps...
+Match Found. Operation completed!
+
+$ ./ukermit -p /dev/ttyS1 -f ../u-serial.bin
+[NOTE: use ukermit to download the file to the target]
+Downloading file: 100.000% completed(35108/35108 bytes)
+File Download completed
+
+$ ./ucmd -p /dev/ttyS1 -c "go 0x80000000" -e "X-load 343x>"
+[NOTE: we just execute the file which was downloaded]
+Output:
+go 0x80000000
+## Starting application at 0x80.0.0-rc5-git (Aug 21 2008 - 11:22:15)
+
+Board: Texas Instrument's SDP343x
+Malloc space: 0x87bfff10 -> 0x87ffff10 (size  4 MB)
+Stack space : 0x87bf7f10 -> 0x87bfff10 (size 32 kB)
+running /env/bin/init...
+not found
+X-load 343x>
+Match Found. Operation completed!
+
+[NOTE: you could embedd these in script files to automate commonly used
+operations such as flashing an image etc.. and ease up things a lot more]
+
+8) Files and Directories
+========================
+. (Source Root. All final executables are generated here)
+|-- COPYING (Copy Right file ->READ THIS)
+|-- README.txt (This file)
+|-- docs (documentation Directory)
+|   |-- app_pserial.dox
+|   |-- app_ucmd.dox
+|   |-- app_ukermit.dox
+|   |-- apps.dox
+|   |-- compile.dox
+|   |-- doxyfile
+|   |-- library.dox
+|   `-- main.dox
+<   `--html/index.html -> This is root html file when we generate docs>
+<   `--latex/refman.pdf -> This is the final pdf when we generate docs>
+|-- include (common headers for libraries)
+|   |-- file.h
+|   |-- f_status.h
+|   |-- rev.h
+|   `-- serial.h
+|-- lib (libraries used by apps)
+|   |-- file_posix.c (Linux/Mac OS/posix compilant file ops)
+|   |-- file_win32.c (Windows file ops)
+|   |-- f_status.c (show off status of operations)
+|   |-- serial_posix.c (Linux/Mac OS/posix Serial port ops)
+|   `-- serial_win32.c (Windows Serial port ops)
+|-- makefile (make file for build)
+`-- src (app source directory)
+    |-- pserial.c (pserial source)
+    |-- ucmd.c (ucmd source)
+    |-- pusb.c (ucmd source)
+    `-- ukermit.c (ukermit source)
+
+4 directories, 26 files
+
+
+9) Credits
+========================
+At the start of writing this code, there was no git, no svn, just zip files,
+so a couple of honorable mentions at this time:
+Dirk Behme - general directions and initial usb discussion as here:
+http://groups.google.com/group/beagleboard/browse_thread/thread/ae2c601ebe104a4
+pusb is a scratch write but in general uses the same concepts
+
+Rob Clark - Mac OS support, tons of cleanups in serial code, and in general a
+ willing experimenter with new ideas :)

@@ -1,0 +1,27 @@
+/**
+@page ub_pusb pusb
+
+This Application helps download a second file as response to ASIC ID over
+USB
+
+@section section Syntax:
+@code
+pusb [-v] [-d device_ID] -f input_file
+@endcode
+
+Where:
+@li -v          : (optional) Chitter chatter verbose
+@li -q          : (optional) Ultra quiet - no outputs other than error
+@li -d device_ID: (optional) USB Device id (Uses default of 0xD009)
+@li -f input_file: input file to be transmitted to target
+
+@warning Use sudo to get access to set_configuration
+
+@section example Usage Example:
+@code
+Linux: sudo ./pusb -d 0xd009 -f ~/tmp/u-boot.bin
+@endcode
+
+@section file Files:
+@li @ref src/pusb.c
+*/

@@ -1,0 +1,45 @@
+/** @mainpage OMAP U-Boot Utils
+
+@section uboot_utils_intro Introduction
+This is a bunch of utilities meant to work with U-Boot
+[http://www.denx.de/wiki/UBoot]
+
+@section uboot_utils_motivation Motivation:
+Traditionally U-Boot has worked with terminal applications such as
+ minicom/hyperterminal etc. However,
+@li These applications dont work out fine when we think of automating these
+ as part of scripts or the like.
+@li Many corporations use a mixture of Operating Systems at work. Common
+ applications functioning similarly accross host Operating Systems are sadly
+ lacking.
+
+This bunch of utilities we hope to bridge these gaps. We can create wrappers
+ on top of these utilities, allowing us to potentially have automated
+ command execution driven from the host.
+
+@section uboot_utils_details Details
+@li @subpage ub_compiliation
+@li @subpage ub_caveats
+@li @subpage ub_library
+@li @subpage ub_apps
+
+@section license U-Boot Utils' License
+
+@verbatim
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation version 2.
+
+This program is distributed "as is" WITHOUT ANY WARRANTY of any kind,
+whether express or implied; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+MA 02111-1307 USA
+@endverbatim
+
+*/
+

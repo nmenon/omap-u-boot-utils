@@ -1,0 +1,27 @@
+/**
+@page ub_ucmd ucmd
+
+This sends a command and expects a provided matching response from target
+
+@section section Syntax:
+@code
+ucmd -p portName -c "command to send" -e "Expect String"
+@endcode
+
+Where:
+@li portName - RS232 device being used. Example: Linux: /dev/ttyS0, Windows:
+           COM1,COM2 etc.
+@li command to send - Command to send to uboot
+@li Expect string - String to expect from target - on match the application returns
+
+@section example Usage Example:
+@code
+Linux: ./ucmd -p /dev/ttyS0 -c "help" -e "U-Boot>"
+@endcode
+@code
+Windows: ucmd.exe -p COM1 -c "help" -e "U-Boot>"
+@endcode
+
+@section file Files:
+@li @ref src/ucmd.c
+*/

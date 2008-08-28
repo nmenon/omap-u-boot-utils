@@ -1,0 +1,117 @@
+/**
+@page ub_compiliation Compiling the Code
+@html <h2>Table Of Contents </h2> @endhtml
+
+@li @ref a
+@li @ref a_1
+@li @ref a_2
+@li @ref a_2_1
+@li @ref a_2_2
+@li @ref b
+
+@section a A) Getting ready to compile code
+
+@subsection a_1  A.1) Linux
+This section explains the compilation environment needs of linux
+
+Based on which ever distribution you have, you would need gcc, make,
+binutils, libc, system utils such as find, sed, uname, grep, tr etc. For
+documentation, you'd need doxygen and graphviz, latex, pdflatex, makeindex.
+For pusb, you will need libusb(and known to work only on Linux at the moment)
+
+You could run "apt-get install gcc" or "yum install gcc" based on debian or
+redhat distributions.
+
+
+@subsection a_2 A.2) Windows
+
+@subsubsection a_2_1 A.2.1) Get the Environment:
+NOTE: based on the speed of your internet connection and machine speed, these
+steps could take quite a while.. So dont blame me ;). I have just tried these
+on a 32 bit Windows XP machine, so no guarentees on 64 bit or Windows
+Vista,2000,95 and whatever is around..
+
+@li MingW Compiler: http://www.mingw.org/
+@verbatim
+ i) Download automated installer from:
+ http://sourceforge.net/project/showfiles.php?group_id=2435&package_id=240780
+ ii) Select gcc from options provided to <compiler directory>
+     Example: C:\MinGW
+	<compiler directory> = C:\MingW
+@endverbatim
+@li Get compilation environment:GnuWin32 http://gnuwin32.sourceforge.net/
+ you can install individual packages from
+http://gnuwin32.sourceforge.net/packages.html OR go for the entire package by
+getting getGnuWin32 from
+http://sourceforge.net/project/showfiles.php?group_id=163416&package_id=184724
+. Follow the steps provided below:
+@verbatim
+ i) Run the getGNUWin32 application to download and install GNUwin32 apps
+ ii) Select the location to install the applications to <tmp directory>
+    Example: c:\gnuWinTemp
+ iii) Click on windows start->run "cmd"
+ iv) cd to C:\gnuWinTemp\GetGnuWin32\
+ v) If you have a net proxy to set, this would be the time to do it. e.g. for
+    http proxy(proxy.com) running on port 80, run:
+    set http_proxy=http://proxy.com:80
+    Note: NO QUOTES. Dont try 'set http_proxy="http://proxy.com:80"'.
+    Things are a bit brain dead and takes '"' as part of the variable.
+ vi) Setup the mirrors:
+   Example: set GNUWIN32_MIRROR="voxel umn unc"
+	(Yes with the '"'s)
+   Note: if you want to see the available mirrors run 'notepad readme.txt'
+ vii) Run the command "download" -> This will take a while all the apps are
+   pulled down, but, what the heck, you get all the apps :).
+   Note: if you do not desire to install all, read the readme.txt on how to
+   select the packages you'd need to install
+ viii) Run the command "install" -> This again could take a while
+ ix) now open a windows explorer window (windows key+e) and move the directory
+	<temp directory> to <app directory>. Example:
+	C:\gnuWinTemp\GetGnuWin32\gnuwin32 to c:\gnuwin32
+	directory c:\gnuWinTemp can now be deleted (if you would like to save some
+    disk space)
+	<app directory> = c:\gnuwin32
+@endverbatim
+@li Setup the environment variables
+@verbatim
+ i) Right click on system and select "System Properties"
+ ii) Click on "Advanced" Tab
+ iii) Click on the "Environment Variable" button
+ iv) Add <app directory>\bin and <compiler directory>\bin to the Path
+     variable (it is in System variable).
+	Example: c:\gnuwin32\bin;C:\MinGW\bin
+@endverbatim
+
+@subsubsection a_2_2 A.2.2) Additional params for building code for Windows
+You can choose where the make,gcc are taken in windows compilation:
+@verbatim
+i) Using variables to compile
+   Example:
+		set COMPILER_PREFIX=C:\MingW\bin\
+		set APP_PREFIX=C:\gnuwin32\bin\
+		make
+
+ii) Edit the Makefile and change the COMPILER_PREFIX and APP_PREFIX variables
+to point to where the files are present.
+@endverbatim
+To Compile code open a new command prompt by running "cmd" from start->run
+cd to the code and do a make
+
+
+@section b B) Compiling the code:
+make can be invoked in the following manner:
+@li Build binaries:
+@code make@endcode will compile all binaries except pusb.
+@code make usb@endcode will compile pusb.(currently only for linux)
+@li Build documentation
+@code make docs @endcode will generate html documentation
+@li Clean up the build
+@code make clean @endcode will clean out all build object files + executables
+@code make distclean @endcode will do what clean does + find and destroy all temporary files and any generated documentation.
+
+By default, code builds in quiet mode, by setting variable V=1 during
+compile, you can get detailed build steps. Example:
+@code
+make V=1
+@endcode
+*/

@@ -1,0 +1,27 @@
+/**
+@page ub_pserial pserial
+
+This Application helps download a second file as response to ASIC ID over
+serial port
+
+@section section Syntax:
+@code
+pserial -p portName -f fileToDownload
+@endcode
+
+Where:
+@li portName - RS232 device being used. Example: Linux: /dev/ttyS0, Windows:
+           COM1,COM2 etc.
+@li fileToDownload - file to be downloaded as response to asic id
+
+@section example Usage Example:
+@code
+Linux: ./pserial -p /dev/ttyS0 -f ~/tmp/u-boot.bin
+@endcode
+@code
+Windows: pserial.exe -p COM1 -f z:\tmp\u-boot.bin
+@endcode
+
+@section file Files:
+@li @ref src/pserial.c
+*/

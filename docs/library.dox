@@ -1,0 +1,10 @@
+/**
+@page ub_library OS dependent Libraries
+
+In general accessing OS specific system devices such as file and serial port tends to be a pain. Hence,
+there we define a set of APIs which are OS independent . APIs and defines can be found here:
+@li @ref include/serial.h - provide for OS independent APIs for applications to access serial port
+@li @ref include/file.h - provide OS independent APIs for accessing file
+
+The corresponding OS dependent implementation is done in lib/serial_<OS>.c lib/file_<OS>.c
+*/

@@ -1,0 +1,31 @@
+/**
+@page ub_ukermit ukermit
+
+This Application helps download a fileusing U-Boot's kermit protocol over
+serial port
+
+@section section Syntax:
+@code
+./ukermit -p portName -f fileToDownload [-d delay_time]
+@endcode
+
+Where:
+@li portName - RS232 device being used. Example: Linux: /dev/ttyS0, Windows:
+           COM1,COM2 etc.
+@li fileToDownload - file to be downloaded
+@li delay_time - delay time in ms for ack reciept (optional) - usually used when
+ u-boot has something to do between packets -such as write to nand/nor etc..
+ which takes extra time and standard serial communication apps might fail
+
+@section example Usage Example:
+@code
+Linux: ./ukermit -p /dev/ttyS0 -f ~/tmp/u-boot.bin
+@endcode
+@code
+Windows: ukermit.exe -p COM1 -f z:\tmp\u-boot.bin
+@endcode
+
+@section file Files:
+@li @ref src/ukermit.c
+
+*/
