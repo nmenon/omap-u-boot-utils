@@ -342,7 +342,7 @@ int send_file(struct usb_device *dev, char *f_name)
 		E_PRINT
 		    ("CMD:Expected to write %ld, "
 		     "actual write %d - err str: %s\n",
-		     sizeof(command), ret, strerror(errno));
+		     (long int)sizeof(command), ret, strerror(errno));
 		fail = -1;
 		goto closeup;
 	}
@@ -354,7 +354,7 @@ int send_file(struct usb_device *dev, char *f_name)
 		E_PRINT
 		    ("FSize:Expected to write %ld, "
 		     "actual write %d - err str: %s\n",
-		     sizeof(filesize), ret, strerror(errno));
+		     (long int)sizeof(filesize), ret, strerror(errno));
 		fail = -1;
 		goto closeup;
 	}
