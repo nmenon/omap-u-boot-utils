@@ -1,0 +1,12 @@
+# Ignore libraries
+*.a
+*.o
+# Ignore documentation
+docs/html/*
+docs/latex/*
+# Ignore generated exes
+*.exe
+pusb
+pserial
+ukermit
+ucmd
