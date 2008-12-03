@@ -1,0 +1,10 @@
+#########################################################################
+#                                                                       #
+# Regular Maintainers for OMAP U-Boot Utilities:                        #
+#                                                                       #
+# Note: lists sorted by Maintainer Name                                 #
+#########################################################################
+
+Nishanth Menon <nm@ti.com>
+
+    pusb    pserial    ukermit    ucmd

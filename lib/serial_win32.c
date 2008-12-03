@@ -11,7 +11,7 @@
 /*
  * (C) Copyright 2008
  * Texas Instruments, <www.ti.com>
- * Nishanth Menon <x0nishan@ti.com>
+ * Nishanth Menon <nm@ti.com>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the

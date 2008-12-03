@@ -56,7 +56,7 @@
  *
  * (C) Copyright 2008
  * Texas Instruments, <www.ti.com>
- * Nishanth Menon <x0nishan@ti.com>
+ * Nishanth Menon <nm@ti.com>
  *
  * (C) Copyright 2000-2004
  * Wolfgang Denk, DENX Software Engineering, wd@denx.de.
