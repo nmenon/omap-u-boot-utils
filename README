@@ -211,6 +211,9 @@ Where:
    -f input_file: input file to be transmitted to target
 NOTE: it is required to run this program in sudo mode to get access at times
 
+Usage Example:
+Linux: sudo ./pusb -f u-boot.bin
+
 7) Generic Example of usage
 ===========================
 The following example is using U-Boot-V2. But it is not restricted to just
