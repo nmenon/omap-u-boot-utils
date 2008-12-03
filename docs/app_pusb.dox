@@ -6,11 +6,12 @@ USB
 
 @section section Syntax:
 @code
-pusb [-v] [-d device_ID] -f input_file
+pusb [-v] [-V] [-d device_ID] -f input_file
 @endcode
 
 Where:
-@li -v          : (optional) Chitter chatter verbose
+@li -v          : (optional) verbose messages
+@li -V          : (optional) verbose messages + usblib debug messages
 @li -q          : (optional) Ultra quiet - no outputs other than error
 @li -d device_ID: (optional) USB Device id (Uses default of 0xD009)
 @li -f input_file: input file to be transmitted to target
@@ -21,6 +22,11 @@ Where:
 @code
 Linux: sudo ./pusb -d 0xd009 -f ~/tmp/u-boot.bin
 @endcode
+
+For *ix users:
+Note pusb uses LibUSB. This is dependent on usbfs being present in the system.
+See http://www.linuxquestions.org/linux/answers/Programming/Developing_Linux_Device_Drivers_using_Libusb_API
+for further information
 
 @section file Files:
 @li @ref src/pusb.c

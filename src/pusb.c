@@ -412,9 +412,10 @@ void help(void)
 	       "response to ASIC ID over USB\n\n"
 	       "Syntax:\n"
 	       "------\n"
-	       "  %s [-v] [-d device_ID] -f input_file \n"
+	       "  %s [-v] [-V] [-d device_ID] -f input_file \n"
 	       "Where:\n" "-----\n"
-	       "   -v          : (optional) Chitter chatter verbose\n"
+	       "   -v          : (optional) verbose messages\n"
+	       "   -V          : (optional) verbose messages + usblib debug messages\n"
 	       "   -q          : (optional) Ultra quiet - no outputs other than error\n"
 	       "   -d device_ID: (optional) USB Device id (Uses default of 0x%X)\n"
 	       "   -f input_file: input file to be transmitted to target\n"
@@ -448,13 +449,16 @@ int main(int argc, char *argv[])
 	 *  -v -verbose
 	 *  -q -ultraquiet
 	 */
-	while ((c = getopt(argc, argv, ":vqd:f:")) != -1) {
+	while ((c = getopt(argc, argv, ":vVqd:f:")) != -1) {
 		switch (c) {
+		case 'q':
+			verbose = -1;
+			break;
 		case 'v':
 			verbose = 1;
 			break;
-		case 'q':
-			verbose = -1;
+		case 'V':
+			verbose = 2;
 			break;
 		case 'f':
 			filename = optarg;
@@ -474,6 +478,9 @@ int main(int argc, char *argv[])
 		return -2;
 	}
 
+	if (verbose == 2) {
+		usb_set_debug(255);
+	}
 	usb_init();
 	old_bus = usb_find_busses();
 	old_dev = 0;

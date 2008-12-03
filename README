@@ -202,10 +202,11 @@ This Application helps download a second file as response to ASIC ID over USB
 
 Syntax:
 ------
-  ./pusb [-v] [-d device_ID] -f input_file
+  ./pusb [-v] [-V] [-d device_ID] -f input_file
 Where:
 -----
-   -v          : (optional) Chitter chatter verbose
+   -v          : (optional) verbose messages
+   -V          : (optional) verbose messages + usblib debug messages
    -q          : (optional) Ultra quiet - no outputs other than error
    -d device_ID: (optional) USB Device id (Uses default of 0xD009)
    -f input_file: input file to be transmitted to target
