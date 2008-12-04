@@ -41,7 +41,6 @@
 
 #include <serial.h>
 
-
 /************* CONSTS ***************/
 #define S_ERROR(ARGS...) perror("Serial: System Error"); fprintf(stderr,ARGS)
 #ifdef DEBUG
@@ -50,6 +49,9 @@
 #else
 #define S_INFO(ARGS...)
 #endif
+
+/* Setup delay time */
+#define VTIME_SET 5
 
 /************* VARS   ***************/
 static unsigned char port[30];
@@ -178,6 +180,7 @@ signed char s_configure(unsigned long s_baud_rate, unsigned char s_parity,
 		return SERIAL_FAILED;
 	}
 
+	newtio.c_iflag |= IGNBRK;
 	newtio.c_cflag |= CLOCAL | CREAD;
 
 	S_INFO("c_cflag: 0x%08x\n", (unsigned int)(newtio.c_cflag));
@@ -185,8 +188,9 @@ signed char s_configure(unsigned long s_baud_rate, unsigned char s_parity,
 	newtio.c_oflag = 0;
 	/* set input mode (non-canonical, no echo,...) */
 	newtio.c_lflag = 0;
+	newtio.c_cc[VTIME] = VTIME_SET;
 	newtio.c_cc[VMIN] = 1;
-	newtio.c_cc[VTIME] = 0;
+	newtio.c_cc[VSWTC] = 0;
 	ret = tcflush(fd, TCIFLUSH);
 	if (ret < 0) {
 		S_ERROR("failed to set flush buffers\n");
@@ -239,11 +243,25 @@ signed char s_close(void)
 		S_ERROR("terminal is not open!\n");
 		return SERIAL_FAILED;
 	}
+	/*
+	 * To prevent switching modes before the last vestiges
+	 * of the data bits have been send, sleep a second.
+	 * This seems to be especially true for usb2serial
+	 * convertors.. it does look as if the data is buffered
+	 * at the usb2serial device itself and closing/changing
+	 * attribs before the final data is pushed is going to
+	 * kill the last bits which need to be send
+	 */
+	sleep(1);
 	/* restore the old port settings */
 	ret = tcsetattr(fd, TCSANOW, &oldtio);
 	if (ret < 0) {
 		S_ERROR("failed to rest old settings\n");
 		return SERIAL_FAILED;
+	}
+	ret = tcflush(fd, TCIFLUSH);
+	if (ret < 0) {
+		S_ERROR("failed to flush serial file handle\n");
 	}
 	ret = close(fd);
 	fd = 0;
@@ -272,7 +290,7 @@ signed int s_read(unsigned char *p_buffer, unsigned long size)
 	}
 	/* read entire chunk.. no giving up! */
 	newtio.c_cc[VMIN] = size;
-	newtio.c_cc[VTIME] = 0;
+	newtio.c_cc[VTIME] = VTIME_SET;
 	ret = tcsetattr(fd, TCSANOW, &newtio);
 	ret = read(fd, p_buffer, size);
 	if (ret < 0) {
