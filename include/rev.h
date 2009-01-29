@@ -26,5 +26,5 @@
  */
 #ifndef __LIB_REV_H
 #define __LIB_REV_H
-#define OMAP_UBOOT_UTILS_REVISION "\n Rev: OMAP U-boot Utils v0.1\n"
+#define OMAP_UBOOT_UTILS_REVISION "\n Rev: OMAP U-boot Utils v0.2\n"
 #endif /* __LIB_REV_H */
