@@ -265,15 +265,18 @@ operations such as flashing an image etc.. and ease up things a lot more]
 |-- COPYING (Copy Right file ->READ THIS)
 |-- README (This file)
 |-- docs (documentation Directory)
-|   |-- app_pserial.dox
-|   |-- app_ucmd.dox
-|   |-- app_ukermit.dox
-|   |-- apps.dox
-|   |-- compile.dox
-|   |-- doxyfile
-|   |-- library.dox
-|   `-- main.dox
+|   |-- c1_s1_main.dox
+|   |-- c2_s1_caveat.dox
+|   |-- c3_s1_apps.dox
+|   |-- c3_s2_app_pserial.dox
+|   |-- c3_s3_app_pusb.dox
+|   |-- c3_s4_app_ukermit.dox
+|   |-- c3_s5_app_ucmd.dox
+|   |-- c4_s1_compile.dox
+|   |-- c5_s1_library.dox
+|   `-- doxyfile
 <   `--html/index.html -> This is root html file when we generate docs>
+<   `--html/index.hhc -> This is root hhc project file for generating chm>
 <   `--latex/refman.pdf -> This is the final pdf when we generate docs>
 |-- include (common headers for libraries)
 |   |-- file.h
