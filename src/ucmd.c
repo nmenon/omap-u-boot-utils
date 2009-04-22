@@ -10,7 +10,7 @@
  *
  */
 /*
- * (C) Copyright 2008
+ * (C) Copyright 2008-2009
  * Texas Instruments, <www.ti.com>
  * Nishanth Menon <nm@ti.com>
  *
@@ -137,11 +137,8 @@ static void usage(char *appname)
 	       "Usage Example:\n" "-------------\n"
 	       "%s -" PORT_ARG " " PORT_NAME " -" CMD_ARG " \"help\" -" EXP_ARG
 	       " \"U-Boot>\"\n"
-	       OMAP_UBOOT_UTILS_REVISION
-	       "\nCopyright (C) 2008 Texas Instruments, <www.ti.com>\n"
-	       "This is free software; see the source for copying conditions.\n"
-	       "There is NO warranty; not even for MERCHANTABILITY or FITNESS \n"
-	       "FOR A PARTICULAR PURPOSE.\n", appname, appname);
+	       OMAP_UBOOT_UTILS_REVISION OMAP_UBOOT_UTILS_LICENSE, appname,
+	       appname);
 }
 
 /**

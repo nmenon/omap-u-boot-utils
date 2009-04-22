@@ -11,7 +11,7 @@
  *
  */
 /*
- * (C) Copyright 2008
+ * (C) Copyright 2008-2009
  * Texas Instruments, <www.ti.com>
  * Nishanth Menon <nm@ti.com>
  *
@@ -422,12 +422,8 @@ void help(void)
 	       "NOTE: it is required to run this program in sudo mode to get access at times\n"
 	       "Usage Example:\n" "-------------\n"
 	       "sudo %s -f F_NAME \n"
-	       OMAP_UBOOT_UTILS_REVISION
-	       "\nCopyright (C) 2008 Texas Instruments, <www.ti.com>\n"
-	       "This is free software; see the source for copying conditions.\n"
-	       "There is NO warranty; not even for MERCHANTABILITY or FITNESS \n"
-	       "FOR A PARTICULAR PURPOSE.\n",
-	       program_name, search_product, program_name);
+	       OMAP_UBOOT_UTILS_REVISION OMAP_UBOOT_UTILS_LICENSE, program_name,
+	       search_product, program_name);
 }
 
 int main(int argc, char *argv[])

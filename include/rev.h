@@ -6,7 +6,7 @@
  *
  */
 /*
- * (C) Copyright 2008
+ * (C) Copyright 2008-2009
  * Texas Instruments, <www.ti.com>
  * Nishanth Menon <nm@ti.com>
  *
@@ -26,5 +26,10 @@
  */
 #ifndef __LIB_REV_H
 #define __LIB_REV_H
-#define OMAP_UBOOT_UTILS_REVISION "\n Rev: OMAP U-boot Utils v0.2\n"
+#define OMAP_UBOOT_UTILS_REVISION "\n Rev: OMAP U-boot Utils v0.2.1\n"
+#define OMAP_UBOOT_UTILS_LICENSE \
+	       "\nCopyright (C) 2008-2009 Texas Instruments, <www.ti.com>\n"\
+	       "This is free software; see the source for copying conditions.\n"\
+	       "There is NO warranty; not even for MERCHANTABILITY or FITNESS\n"\
+	       "FOR A PARTICULAR PURPOSE.\n"
 #endif /* __LIB_REV_H */
