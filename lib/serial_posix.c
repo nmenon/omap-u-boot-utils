@@ -35,6 +35,7 @@
 #include <fcntl.h>
 #include <termios.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <errno.h>
@@ -69,8 +70,23 @@ static struct termios oldtio, newtio;
  */
 signed char s_open(char *t_port)
 {
+	int x;
+	char cmd[200];
 	if (fd) {
 		S_ERROR("Port is already open\n");
+		return SERIAL_FAILED;
+	}
+	/* Check if serial port is used by other process */
+
+	/* NOTE: it is a bad idea to use lsof, but the alternative
+	 * is to write large amount of code..
+	 */
+	sprintf(cmd, "lsof |grep %s 2>&1 >/dev/null", t_port);
+	x = system(cmd);
+	if (x == 0) {
+		S_ERROR("device %s being used already?\n", t_port);
+		sprintf(cmd, "lsof |grep %s", t_port);
+		system(cmd);
 		return SERIAL_FAILED;
 	}
 	fd = open(t_port, O_RDWR | O_NOCTTY);
