@@ -40,9 +40,10 @@
 #include <errno.h>
 
 #include <serial.h>
+#include <common.h>
 
 /************* CONSTS ***************/
-#define S_ERROR(ARGS...) perror("Serial: System Error"); fprintf(stderr,ARGS)
+#define S_ERROR(ARGS...) APP_ERROR(ARGS); perror("Serial: System Error")
 #ifdef DEBUG
 #define S_INFO(FORMAT,ARGS...) printf ("%s[%d]:" FORMAT "\n",\
 				__FUNCTION__,__LINE__,ARGS)
@@ -162,7 +163,7 @@ signed char s_configure(unsigned long s_baud_rate, unsigned char s_parity,
 		return SERIAL_FAILED;
 	}
 
-	newtio.c_cflag &= ~(PARENB|PARODD);
+	newtio.c_cflag &= ~(PARENB | PARODD);
 	newtio.c_iflag &= ~(IGNPAR);
 	switch (s_parity) {
 	case ODDPARITY:	/* odd */

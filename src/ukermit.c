@@ -80,7 +80,7 @@
  * MA 02111-1307 USA
  */
 #ifdef __WIN32__
-#include <windows.h>  /* for sleep() in dos/mingw */
+#include <windows.h>		/* for sleep() in dos/mingw */
 #endif
 
 #include <ctype.h>
@@ -122,7 +122,6 @@
 		((x>=SPACE)?untochar(x):x))
 #endif
 
-#define APP_ERROR(ARGS...)	fprintf(stderr,ARGS)
 /* use page sized chunks */
 #ifdef LARGE_PACKETS_ENABLE
 #define MAX_CHUNK		500
@@ -191,7 +190,7 @@ static void s1_getpacket(char *packet, int size)
 		size--;
 	}
 #else
-	memset((void*) packet,0x00,size);
+	memset((void *)packet, 0x00, size);
 	if (delay)
 #ifndef __WIN32__
 		usleep(1000 * delay);
@@ -302,8 +301,8 @@ static signed int k_send_data_packet_small(unsigned char *buffer,
 	/* Allocation assuming all need escape characters.. */
 	char *my_new_buffer = calloc(1, (size * 2) + 3);
 	if (my_new_buffer == NULL) {
-		APP_ERROR("failed to allocate memory \n");
-		perror(NULL);
+		APP_ERROR("failed to allocate memory \n")
+		    perror(NULL);
 		return -1;
 	}
 	memset(&k_small, 0, sizeof(struct kermit_data_header_small));
@@ -402,8 +401,8 @@ static signed int k_send_data_packet_large(unsigned char *buffer,
 	/* Allocation assuming all need escape characters.. */
 	char *my_new_buffer = calloc(1, (size * 2) + 3);
 	if (my_new_buffer == NULL) {
-		APP_ERROR("failed to allocate memory \n");
-		perror(NULL);
+		APP_ERROR("failed to allocate memory \n")
+		    perror(NULL);
 		return -1;
 	}
 	memset(&k_large, 0, sizeof(struct kermit_data_header_large));
@@ -527,30 +526,30 @@ static signed int kermit_ack_type(int seq_num)
 	/* Check if this is a valid packet by checking checksum */
 	if (k_ack.checksum != tochar((sum + ((sum >> 6) & 0x03)) & 0x3f)) {
 #ifdef DEBUG
-		APP_ERROR("checksum mismatch\n");
-		print_ack_packet(&k_ack);
+		APP_ERROR("checksum mismatch\n")
+		    print_ack_packet(&k_ack);
 #endif
 		return CHK_ERROR;
 	}
 	/* message for the right seq? */
 	if (untochar(k_ack.sequence_number) != seq_num) {
 		APP_ERROR("sequence_num mismatch. expected [%d] Got %d\n",
-			  seq_num, untochar(k_ack.sequence_number));
+			  seq_num, untochar(k_ack.sequence_number))
 #ifdef DEBUG
-		print_ack_packet(&k_ack);
+		    print_ack_packet(&k_ack);
 #endif
 		return SEQ_ERROR;
 	}
 	if (k_ack.packet_type == NACK_TYPE) {
-		APP_ERROR("NACKed!!\n");
-		return NACK_TYPE;
+		APP_ERROR("NACKed!!\n")
+		    return NACK_TYPE;
 	}
 	if (k_ack.packet_type == ACK_TYPE) {
 		return ACK_TYPE;
 	}
 	/* other chars */
-	APP_ERROR("Unexpected packet type\n");
-	print_ack_packet(&k_ack);
+	APP_ERROR("Unexpected packet type\n")
+	    print_ack_packet(&k_ack);
 	return -3;
 }
 
@@ -574,20 +573,20 @@ static signed int k_send_data(char *f_name)
 	ori_size = size = f_size(f_name);
 
 	if (size < 0) {
-		APP_ERROR("File Size Operation failed! File exists?\n");
-		return size;
+		APP_ERROR("File Size Operation failed! File exists?\n")
+		    return size;
 	}
 	if (f_open(f_name) != FILE_OK) {
-		APP_ERROR("File Open failed!File Exists & readable?\n");
-		return -1;
+		APP_ERROR("File Open failed!File Exists & readable?\n")
+		    return -1;
 	}
 	f_status_init(ori_size, NORMAL_PRINT);
 	while (size) {
 		send_size = (size > MAX_CHUNK) ? MAX_CHUNK : size;
 		send_size = f_read((unsigned char *)buffer, send_size);
 		if (send_size < 0) {
-			APP_ERROR("Oops.. file read failed!\n");
-			break;
+			APP_ERROR("Oops.. file read failed!\n")
+			    break;
 		}
 		retry = 0;
 		/* we will retry packets to an extent! */
@@ -609,13 +608,13 @@ static signed int k_send_data(char *f_name)
 						       send_size, sequence);
 #endif
 			if (ret < 0) {
-				APP_ERROR("Failedin send\n");
-				return ret;
+				APP_ERROR("Failedin send\n")
+				    return ret;
 			}
 			ret = kermit_ack_type(sequence);
 			if (ret < 0) {
-				APP_ERROR("Failedin ack %d\n", ret);
-				return ret;
+				APP_ERROR("Failedin ack %d\n", ret)
+				    return ret;
 			}
 			if (ret != ACK_TYPE) {
 				retry++;
@@ -624,8 +623,8 @@ static signed int k_send_data(char *f_name)
 		if (retry == RETRY_MAX) {
 			APP_ERROR("Failed after %d retries in sequence %d - "
 				  "success send = %ld bytes\n",
-				  RETRY_MAX, sequence, (ori_size - size));
-			return -1;
+				  RETRY_MAX, sequence, (ori_size - size))
+			    return -1;
 		}
 		sequence++;
 		/* Roll over sequence number */
@@ -638,7 +637,7 @@ static signed int k_send_data(char *f_name)
 	/* Send the completion char */
 	s1_sendpacket(&done_transmit, 1);
 	if (f_close() != FILE_OK) {
-		APP_ERROR("File Close failed\n");
+		APP_ERROR("File Close failed\n")
 	}
 	return 0;
 }
@@ -672,9 +671,10 @@ static void usage(char *appname)
 	       "fileToDownload - file to be downloaded\n\n"
 	       "delay_time - delay time in ms for ack reciept(optional)\n\n"
 	       "Usage Example:\n" "-------------\n"
-	       "%s -" PORT_ARG " " PORT_NAME " -" DNLD_ARG " " F_NAME "\n"
-	       OMAP_UBOOT_UTILS_REVISION OMAP_UBOOT_UTILS_LICENSE, appname,
-	       appname);
+	       "%s -" PORT_ARG " " PORT_NAME " -" DNLD_ARG " " F_NAME "\n",
+	       appname, appname);
+	REVPRINT();
+	LIC_PRINT();
 }
 
 /**
@@ -695,10 +695,12 @@ int main(int argc, char **argv)
 	/* Option validation */
 	opterr = 0;
 
-	while ((c = getopt(argc, argv, DLY_ARG ":"PORT_ARG ":" DNLD_ARG ":")) != -1)
+	while ((c =
+		getopt(argc, argv,
+		       DLY_ARG ":" PORT_ARG ":" DNLD_ARG ":")) != -1)
 		switch (c) {
 		case DLY_ARG_C:
-			sscanf(optarg,"%d",&delay);
+			sscanf(optarg, "%d", &delay);
 			break;
 		case PORT_ARG_C:
 			port = optarg;
@@ -707,49 +709,50 @@ int main(int argc, char **argv)
 			download_file = optarg;
 			break;
 		case '?':
-			if ((optopt == DNLD_ARG_C) || (optopt == PORT_ARG_C))
+			if ((optopt == DNLD_ARG_C) || (optopt == PORT_ARG_C)) {
 				APP_ERROR("Option -%c requires an argument.\n",
-					  optopt);
-			else if (isprint(optopt))
-				APP_ERROR("Unknown option `-%c'.\n", optopt);
-			else
+					  optopt)
+			} else if (isprint(optopt)) {
+				APP_ERROR("Unknown option `-%c'.\n", optopt)
+			} else {
 				APP_ERROR("Unknown option character `\\x%x'.\n",
-					  optopt);
+					  optopt)
+			}
 			usage(appname);
 			return 1;
 		default:
 			abort();
 		}
 	if ((port == NULL) || (download_file == NULL)) {
-		APP_ERROR("Error: Not Enough Args\n");
-		usage(appname);
+		APP_ERROR("Error: Not Enough Args\n")
+		    usage(appname);
 		return -1;
 	}
 
 	/* Setup the port */
 	ret = s_open(port);
 	if (ret != SERIAL_OK) {
-		APP_ERROR("serial open failed\n");
-		return ret;
+		APP_ERROR("serial open failed\n")
+		    return ret;
 	}
 	ret = s_configure(115200, NOPARITY, ONE_STOP_BIT, 8);
 	if (ret != SERIAL_OK) {
 		s_close();
-		APP_ERROR("serial configure failed\n");
-		return ret;
+		APP_ERROR("serial configure failed\n")
+		    return ret;
 	}
 
 	s_flush(NULL, NULL);
 	ret = k_send_data(download_file);
 	if (ret != 0) {
 		s_close();
-		APP_ERROR("Data transmit failed\n");
-		return ret;
+		APP_ERROR("Data transmit failed\n")
+		    return ret;
 	}
 	ret = s_close();
 	if (ret != SERIAL_OK) {
-		APP_ERROR("serial close failed\n");
-		return ret;
+		APP_ERROR("serial close failed\n")
+		    return ret;
 	}
 	printf("\nFile Download completed\n");
 	return 0;

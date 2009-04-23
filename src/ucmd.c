@@ -44,8 +44,6 @@
 #define EXP_ARG		"e"
 #define EXP_ARG_C	'e'
 
-#define APP_ERROR(ARGS...) fprintf(stderr,ARGS)
-
 /**
  * @brief send_cmd - send the command to uboot
  *
@@ -60,8 +58,8 @@ static int send_cmd(char *cmd)
 	int len = strlen(cmd);
 	buffer = calloc(len + 2, 1);
 	if (buffer == NULL) {
-		APP_ERROR("failed to allocate %d bytes\n", len + 2);
-		perror("fail reason:");
+		APP_ERROR("failed to allocate %d bytes\n", len + 2)
+		    perror("fail reason:");
 		return SERIAL_FAILED;
 	}
 	/* The command */
@@ -92,8 +90,8 @@ static int get_response(char *expected)
 	while (match_idx < len) {
 		ret = s_getc();
 		if (ret < 0) {
-			APP_ERROR("Failed to read character\n");
-			return ret;
+			APP_ERROR("Failed to read character\n")
+			    return ret;
 		}
 		current_char = (char)ret;
 		if (current_char == expected[match_idx]) {
@@ -136,9 +134,9 @@ static void usage(char *appname)
 	       " the application returns\n"
 	       "Usage Example:\n" "-------------\n"
 	       "%s -" PORT_ARG " " PORT_NAME " -" CMD_ARG " \"help\" -" EXP_ARG
-	       " \"U-Boot>\"\n"
-	       OMAP_UBOOT_UTILS_REVISION OMAP_UBOOT_UTILS_LICENSE, appname,
-	       appname);
+	       " \"U-Boot>\"\n", appname, appname);
+	REVPRINT();
+	LIC_PRINT();
 }
 
 /**
@@ -174,51 +172,52 @@ int main(int argc, char **argv)
 			break;
 		case '?':
 			if ((optopt == CMD_ARG_C) || (optopt == EXP_ARG_C)
-			    || (optopt == PORT_ARG_C))
+			    || (optopt == PORT_ARG_C)) {
 				APP_ERROR("Option -%c requires an argument.\n",
-					  optopt);
-			else if (isprint(optopt))
-				APP_ERROR("Unknown option `-%c'.\n", optopt);
-			else
+					  optopt)
+			} else if (isprint(optopt)) {
+				APP_ERROR("Unknown option `-%c'.\n", optopt)
+			} else {
 				APP_ERROR("Unknown option character `\\x%x'.\n",
-					  optopt);
+					  optopt)
+			}
 			usage(appname);
 			return 1;
 		default:
 			abort();
 		}
 	if ((port == NULL) || (command == NULL) || (expect == NULL)) {
-		APP_ERROR("Error: Not Enough Args\n");
-		usage(appname);
+		APP_ERROR("Error: Not Enough Args\n")
+		    usage(appname);
 		return -1;
 	}
 
 	/* Setup the port */
 	ret = s_open(port);
 	if (ret != SERIAL_OK) {
-		APP_ERROR("serial open failed\n");
-		return ret;
+		APP_ERROR("serial open failed\n")
+		    return ret;
 	}
 	ret = s_configure(115200, NOPARITY, ONE_STOP_BIT, 8);
 	if (ret != SERIAL_OK) {
 		s_close();
-		APP_ERROR("serial configure failed\n");
-		return ret;
+		APP_ERROR("serial configure failed\n")
+		    return ret;
 	}
 
 	/* Dump all previous data */
 	ret = s_flush(NULL, NULL);
 	if (ret != SERIAL_OK) {
 		s_close();
-		APP_ERROR("Failed to flush data\n");
-		return ret;
+		APP_ERROR("Failed to flush data\n")
+		    return ret;
 	}
 	/* send the command to uboot */
 	ret = send_cmd(command);
 	if (ret != SERIAL_OK) {
 		s_close();
-		APP_ERROR("Failed to send command '%s'\n", command);
-		return ret;
+		APP_ERROR("Failed to send command '%s'\n", command)
+		    return ret;
 	}
 
 	printf("Output:\n");
@@ -226,14 +225,14 @@ int main(int argc, char **argv)
 	ret = get_response(expect);
 	if (ret != SERIAL_OK) {
 		s_close();
-		APP_ERROR("Failed to get expected '%s'\n", expect);
-		return ret;
+		APP_ERROR("Failed to get expected '%s'\n", expect)
+		    return ret;
 	}
 
 	ret = s_close();
 	if (ret != SERIAL_OK) {
-		APP_ERROR("serial close failed\n");
-		return ret;
+		APP_ERROR("serial close failed\n")
+		    return ret;
 	}
 	printf("\nMatch Found. Operation completed!\n");
 

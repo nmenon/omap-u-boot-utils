@@ -67,7 +67,6 @@
 /* Print control */
 #define V_PRINT(ARGS...) if (verbose >= 1) printf(ARGS)
 #define N_PRINT(ARGS...) if (verbose >= 0) printf(ARGS)
-#define E_PRINT(ARGS...) printf("%s:%d:",__func__,__LINE__);printf(ARGS)
 
 static int verbose = 0;
 static unsigned int search_vendor = SEARCH_VENDOR_DEFAULT;
@@ -95,6 +94,7 @@ static void usb_sleep(unsigned int ms)
 	Sleep(ms);
 #endif
 }
+
 /************ POMPOUS SHOW OF USB DESCRIPTOR **********************/
 void print_endpoint(struct usb_endpoint_descriptor *endpoint)
 {
@@ -262,13 +262,13 @@ int configure_device(struct usb_device *dev)
 	int ret = 0;
 	udev = usb_open(dev);
 	if (!udev) {
-		E_PRINT("Unable to open the device.. giving up!\n");
+		APP_ERROR("Unable to open the device.. giving up!\n");
 		return -1;
 	}
 	ret = usb_set_configuration(udev, config_idx);
 	if (ret != 0) {
-		E_PRINT("set configuration returned error :%d %s\n", ret,
-		       strerror(errno));
+		APP_ERROR("set configuration returned error :%d %s\n", ret,
+			  strerror(errno));
 		return ret;
 	}
 	usb_close(udev);
@@ -289,20 +289,20 @@ int send_file(struct usb_device *dev, char *f_name)
 
 	filesize = f_size(f_name);
 	if (filesize > MAX_SIZE) {
-		E_PRINT("Filesize %d >%d max\n",
-		       (unsigned int)filesize, MAX_SIZE);
+		APP_ERROR("Filesize %d >%d max\n",
+			  (unsigned int)filesize, MAX_SIZE);
 		return -1;
 	}
 
 	/* Open the required device and file */
 	udev = usb_open(dev);
 	if (!udev) {
-		E_PRINT("Unable to open the device.. giving up!\n");
+		APP_ERROR("Unable to open the device.. giving up!\n");
 		return -1;
 	}
 	ret = f_open(f_name);
 	if (ret < 0) {
-		E_PRINT("error opening file! -%d\n", ret);
+		APP_ERROR("error opening file! -%d\n", ret);
 		return -1;
 	}
 	if (verbose >= 0) {
@@ -311,8 +311,8 @@ int send_file(struct usb_device *dev, char *f_name)
 	/* Grab the interface for us to send data */
 	ret = usb_claim_interface(udev, INTERFACE_INDEX_DEFAULT);
 	if (ret) {
-		E_PRINT("error claiming usb interface %d-%s\n", ret,
-		       strerror(errno));
+		APP_ERROR("error claiming usb interface %d-%s\n", ret,
+			  strerror(errno));
 		return (ret);
 	}
 	/* read ASIC ID */
@@ -320,8 +320,8 @@ int send_file(struct usb_device *dev, char *f_name)
 	    usb_bulk_read(udev, DEVICE_IN_ENDPOINT, asic_buffer, ASICID_SIZE,
 			  ASIC_ID_TIMEOUT);
 	if (ret != ASICID_SIZE) {
-		E_PRINT("Expected to read %d, read %d - err str: %s\n",
-		       ASICID_SIZE, ret, strerror(errno));
+		APP_ERROR("Expected to read %d, read %d - err str: %s\n",
+			  ASICID_SIZE, ret, strerror(errno));
 		fail = -1;
 		goto closeup;
 	}
@@ -339,7 +339,7 @@ int send_file(struct usb_device *dev, char *f_name)
 	    usb_bulk_write(udev, DEVICE_OUT_ENDPOINT, (char *)&command,
 			   sizeof(command), ASIC_ID_TIMEOUT);
 	if (ret != sizeof(command)) {
-		E_PRINT
+		APP_ERROR
 		    ("CMD:Expected to write %ld, "
 		     "actual write %d - err str: %s\n",
 		     (long int)sizeof(command), ret, strerror(errno));
@@ -351,7 +351,7 @@ int send_file(struct usb_device *dev, char *f_name)
 	    usb_bulk_write(udev, DEVICE_OUT_ENDPOINT, (char *)&filesize,
 			   sizeof(filesize), ASIC_ID_TIMEOUT);
 	if (ret != sizeof(filesize)) {
-		E_PRINT
+		APP_ERROR
 		    ("FSize:Expected to write %ld, "
 		     "actual write %d - err str: %s\n",
 		     (long int)sizeof(filesize), ret, strerror(errno));
@@ -366,9 +366,9 @@ int send_file(struct usb_device *dev, char *f_name)
 		    usb_bulk_write(udev, DEVICE_OUT_ENDPOINT, read_buffer,
 				   r_size, ASIC_ID_TIMEOUT);
 		if (ret != r_size) {
-			E_PRINT
+			APP_ERROR
 			    ("DDump:Expected to write %d, actual write %d %s\n",
-			     r_size, ret,strerror(errno));
+			     r_size, ret, strerror(errno));
 			fail = -1;
 			goto closeup;
 		}
@@ -382,22 +382,22 @@ int send_file(struct usb_device *dev, char *f_name)
       closeup:
 	ret = usb_release_interface(udev, INTERFACE_INDEX_DEFAULT);
 	if (ret) {
-		E_PRINT("error releasing usb interface %d-%s\n", ret,
-		       strerror(errno));
+		APP_ERROR("error releasing usb interface %d-%s\n", ret,
+			  strerror(errno));
 		/* Fall thru */
 		fail = ret;
 	}
 
 	ret = usb_close(udev);
 	if (ret) {
-		E_PRINT("error closing usb interface %d-%s\n", ret,
-		       strerror(errno));
+		APP_ERROR("error closing usb interface %d-%s\n", ret,
+			  strerror(errno));
 		/* Fall thru */
 		fail = ret;
 	}
 	ret = f_close();
 	if (ret) {
-		E_PRINT("error closing file %d-%s\n", ret, strerror(errno));
+		APP_ERROR("error closing file %d-%s\n", ret, strerror(errno));
 		/* Fall thru */
 		fail = ret;
 	}
@@ -421,9 +421,10 @@ void help(void)
 	       "   -f input_file: input file to be transmitted to target\n"
 	       "NOTE: it is required to run this program in sudo mode to get access at times\n"
 	       "Usage Example:\n" "-------------\n"
-	       "sudo %s -f F_NAME \n"
-	       OMAP_UBOOT_UTILS_REVISION OMAP_UBOOT_UTILS_LICENSE, program_name,
-	       search_product, program_name);
+	       "sudo %s -f F_NAME \n", program_name, search_product,
+	       program_name);
+	REVPRINT();
+	LIC_PRINT();
 }
 
 int main(int argc, char *argv[])
@@ -437,6 +438,7 @@ int main(int argc, char *argv[])
 	int new_dev = 0;
 	/* NOTE: mingw did not like this.. */
 	int c;
+	int filesize;
 
 	program_name = argv[0];
 	/* Options supported:
@@ -464,12 +466,16 @@ int main(int argc, char *argv[])
 			break;
 		case '?':
 		default:
+			APP_ERROR("Missing/Wrong Arguments\n");
 			help();
 			return -1;
 		}
 	}
+	if (filename)
+		filesize = f_size(filename);
 	/* Param validate */
-	if (NULL == filename) {
+	if ((NULL == filename) || (filesize == -1)) {
+		APP_ERROR("Missing file to download\n");
 		help();
 		return -2;
 	}
@@ -481,7 +487,7 @@ int main(int argc, char *argv[])
 	old_bus = usb_find_busses();
 	old_dev = 0;
 	N_PRINT("Waiting for USB device vendorID=0x%X"
-	       "and productID=0x%X:\n", search_vendor, search_product);
+		"and productID=0x%X:\n", search_vendor, search_product);
 	while (!found) {
 		/* Enumerate buses once more.. just in case
 		 * we have some one plugging in a device with a hub..
@@ -516,25 +522,25 @@ int main(int argc, char *argv[])
 	c = 0;
 	if (found) {
 		if (!found_dev) {
-			E_PRINT("found_dev NULL! quitting sadly\n");
+			APP_ERROR("found_dev NULL! quitting sadly\n");
 			c = -1;
 			goto exit;
 		}
 		if (verbose >= 0) {
 			c = print_device(found_dev, 0);
-		if (c) {
-			E_PRINT("print dev failed\n");
-			goto exit;
-		}
+			if (c) {
+				APP_ERROR("print dev failed\n");
+				goto exit;
+			}
 		}
 		c = configure_device(found_dev);
 		if (c) {
-			E_PRINT("configure dev failed\n");
+			APP_ERROR("configure dev failed\n");
 			goto exit;
 		}
 		c = send_file(found_dev, filename);
 		if (c) {
-			E_PRINT("send file failed\n");
+			APP_ERROR("send file failed\n");
 		}
 	}
 	if (!c) {

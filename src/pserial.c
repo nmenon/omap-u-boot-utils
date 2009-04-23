@@ -48,8 +48,6 @@
 #define SEC_ARG		"f"
 #define SEC_ARG_C	'f'
 
-#define APP_ERROR(ARGS...) fprintf(stderr,ARGS)
-
 /**
  * @brief send_file - send a file to the host
  *
@@ -68,19 +66,19 @@ static int send_file(char *f_name)
 	size = f_size(f_name);
 
 	if (size < 0) {
-		APP_ERROR("File Size Operation failed! File exists?\n");
-		return size;
+		APP_ERROR("File Size Operation failed! File exists?\n")
+		    return size;
 	}
 	if (f_open(f_name) != FILE_OK) {
-		APP_ERROR("File Open failed!File Exists & readable?\n");
-		return -1;
+		APP_ERROR("File Open failed!File Exists & readable?\n")
+		    return -1;
 	}
-	f_status_init(size,NORMAL_PRINT);
+	f_status_init(size, NORMAL_PRINT);
 	/* Send the size */
 	ret = s_write((unsigned char *)&size, sizeof(size));
 	if (ret != sizeof(size)) {
-		APP_ERROR("Oops.. did not send size properly :(\n");
-		return -1;
+		APP_ERROR("Oops.. did not send size properly :(\n")
+		    return -1;
 	}
 	/* Send the file to target */
 	while (tot_read < size) {
@@ -89,14 +87,14 @@ static int send_file(char *f_name)
 		to_read = (to_read > TOT_SIZE) ? TOT_SIZE : to_read;
 		cur_read = f_read(buffer, to_read);
 		if (cur_read < 0) {
-			APP_ERROR("Oops.. read failed!\n");
-			break;
+			APP_ERROR("Oops.. read failed!\n")
+			    break;
 		}
 		cur_write = s_write(buffer, cur_read);
 		if (cur_write != cur_read) {
 			APP_ERROR("did not right data to serial port"
 				  " serial cur_write = %d, file cur_read= %d\n",
-				  cur_write, cur_read);
+				  cur_write, cur_read)
 		}
 		tot_read += cur_read;
 		f_status_show(tot_read);
@@ -112,7 +110,7 @@ static int send_file(char *f_name)
 	}
 
 	if (f_close() != FILE_OK) {
-		APP_ERROR("File Close failed\n");
+		APP_ERROR("File Close failed\n")
 	}
 	return 0;
 }
@@ -143,9 +141,11 @@ static void usage(char *appname)
 	       "fileToDownload - file to be downloaded as response to "
 	       "asic id\n\n"
 	       "Usage Example:\n" "-------------\n"
-	       "%s -" PORT_ARG " " PORT_NAME " -" SEC_ARG " " F_NAME "\n"
-	       OMAP_UBOOT_UTILS_REVISION OMAP_UBOOT_UTILS_LICENSE, appname,
-	       appname);
+	       "%s -" PORT_ARG " " PORT_NAME " -" SEC_ARG " " F_NAME "\n",
+	       appname, appname);
+	REVPRINT();
+	LIC_PRINT();
+
 }
 
 /**
@@ -177,36 +177,37 @@ int main(int argc, char **argv)
 			second_file = optarg;
 			break;
 		case '?':
-			if ((optopt == SEC_ARG_C) || (optopt == PORT_ARG_C))
+			if ((optopt == SEC_ARG_C) || (optopt == PORT_ARG_C)) {
 				APP_ERROR("Option -%c requires an argument.\n",
-					  optopt);
-			else if (isprint(optopt))
-				APP_ERROR("Unknown option `-%c'.\n", optopt);
-			else
+					  optopt)
+			} else if (isprint(optopt)) {
+				APP_ERROR("Unknown option `-%c'.\n", optopt)
+			} else {
 				APP_ERROR("Unknown option character `\\x%x'.\n",
-					  optopt);
+					  optopt)
+			}
 			usage(appname);
 			return 1;
 		default:
 			abort();
 		}
 	if ((port == NULL) || (second_file == NULL)) {
-		APP_ERROR("Error: Not Enough Args\n");
-		usage(appname);
+		APP_ERROR("Error: Not Enough Args\n")
+		    usage(appname);
 		return -1;
 	}
 
 	/* Setup the port */
 	ret = s_open(port);
 	if (ret != SERIAL_OK) {
-		APP_ERROR("serial open failed\n");
-		return ret;
+		APP_ERROR("serial open failed\n")
+		    return ret;
 	}
 	ret = s_configure(115200, EVENPARITY, ONE_STOP_BIT, 8);
 	if (ret != SERIAL_OK) {
 		s_close();
-		APP_ERROR("serial configure failed\n");
-		return ret;
+		APP_ERROR("serial configure failed\n")
+		    return ret;
 	}
 
 	/* Read ASIC ID */
@@ -214,8 +215,8 @@ int main(int argc, char **argv)
 	while (!ret) {
 		ret = s_read(buff, ASIC_ID_SIZE);
 		if ((ret != ASIC_ID_SIZE)) {
-			APP_ERROR("Did not read asic ID ret = %d\n", ret);
-			s_close();
+			APP_ERROR("Did not read asic ID ret = %d\n", ret)
+			    s_close();
 			return ret;
 		}
 	}
@@ -233,17 +234,17 @@ int main(int argc, char **argv)
 	    s_write((unsigned char *)&download_command,
 		    sizeof(download_command));
 	if (ret != sizeof(download_command)) {
-		APP_ERROR("oppps!! did not actually manage to send command\n");
-		return -1;
+		APP_ERROR("oppps!! did not actually manage to send command\n")
+		    return -1;
 	}
 	if (send_file(second_file) != 0) {
-		APP_ERROR("send file failed!\n");
+		APP_ERROR("send file failed!\n")
 	}
 
 	ret = s_close();
 	if (ret != SERIAL_OK) {
-		APP_ERROR("serial close failed\n");
-		return ret;
+		APP_ERROR("serial close failed\n")
+		    return ret;
 	}
 	printf("\nFile download completed.\n");
 

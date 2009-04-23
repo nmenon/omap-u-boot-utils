@@ -32,6 +32,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "serial.h"
+#include <common.h>
 
 /***** TYPES(WINDOWS SPECIFIC) *******/
 #ifndef FALSE
@@ -45,7 +46,7 @@
 #endif
 
 /************* CONSTS ***************/
-#define S_ERROR(ARGS...) fprintf(stderr,ARGS)
+#define S_ERROR(ARGS...) APP_ERROR(ARGS)
 #define S_INFO(ARGS...)
 #ifdef DEBUG
 #define S_INFO(ARGS...) fprintf(stdout,ARGS)

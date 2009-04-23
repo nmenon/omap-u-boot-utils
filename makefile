@@ -90,6 +90,10 @@ CFLAGS+=-fdata-sections -ffunction-sections
 LDFLAGS+=--gc-sections --print-gc-sections --stdlib
 LDFLAGS_USB=-lusb
 
+ifdef DISABLE_COLOR
+CFLAGS+=-DDISABLE_COLOR
+endif
+
 ifdef V
     VERBOSE = $(V)
 endif

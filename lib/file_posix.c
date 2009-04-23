@@ -31,9 +31,10 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include "file.h"
+#include <common.h>
 
 /************* CONSTS ***************/
-#define F_ERROR(ARGS...) perror("File:System Error: ") ; fprintf(stderr,ARGS)
+#define F_ERROR(ARGS...)  APP_ERROR(ARGS);perror("File:Error")
 
 #ifdef DEBUG
 #define F_INFO(ARGS...) fprintf(stdout,ARGS)

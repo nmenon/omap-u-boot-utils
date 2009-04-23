@@ -31,6 +31,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "file.h"
+#include <common.h>
 
 /***** TYPES(WINDOWS SPECIFIC) *******/
 #ifndef FALSE
@@ -44,7 +45,7 @@
 #endif
 
 /************* CONSTS ***************/
-#define F_ERROR(ARGS...) fprintf(stderr,ARGS)
+#define F_ERROR(ARGS...) APP_ERROR(ARGS)
 #define F_INFO(ARGS...)
 //#define F_INFO(ARGS...) fprintf(stdout,ARGS)
 
