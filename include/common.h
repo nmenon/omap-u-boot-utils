@@ -34,7 +34,7 @@
 #define _COLOR_(m)	"\x1b[" # m
 #define RED		_COLOR_(1;31m)
 #define GREEN		_COLOR_(1;32m)
-#define BLUE		_COLOR_(1;33m)
+#define BLUE		_COLOR_(1;34m)
 #define RESET		_COLOR_(0m)
 
 #define COLOR_PRINT(COLOR,ARGS...)\
