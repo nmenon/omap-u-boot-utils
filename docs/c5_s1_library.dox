@@ -5,6 +5,8 @@ In general accessing OS specific system devices such as file and serial port ten
 there we define a set of APIs which are OS independent . APIs and defines can be found here:
 @li @ref include/serial.h - provide for OS independent APIs for applications to access serial port
 @li @ref include/file.h - provide OS independent APIs for accessing file
+@li lib/lcfg/lcfg_static.h - liblcfg library from Paul Baecher's http://liblcfg.carnivore.it/
+generated with the mksinglefile.sh - rev 0.2.0
 
-The corresponding OS dependent implementation is done in lib/serial_<OS>.c lib/file_<OS>.c
+The corresponding OS dependent implementation is done in lib/serial_[OS].c lib/file_[OS].c
 */

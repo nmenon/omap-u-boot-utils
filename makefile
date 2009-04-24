@@ -49,13 +49,14 @@ LIB_FILES=lib/serial_win32.c lib/file_win32.c
 else
 LIB_FILES=lib/serial_posix.c lib/file_posix.c
 endif
-LIB_FILES+=lib/f_status.c
+LIB_FILES+=lib/f_status.c lib/lcfg/lcfg_static.c
 
 #App source code
 PSERIAL_FILES=src/pserial.c
 KERMIT_FILES=src/ukermit.c
 UCMD_FILES=src/ucmd.c
 PUSB_FILES=src/pusb.c
+GPSIGN_FILES=src/gpsign.c
 
 DOCS=docs/html docs/latex
 
@@ -64,18 +65,20 @@ PSERIAL_EXE=pserial$(EXE_PREFIX)
 KERMIT_EXE=ukermit$(EXE_PREFIX)
 UCMD_EXE=ucmd$(EXE_PREFIX)
 PUSB_EXE=pusb$(EXE_PREFIX)
+GPSIGN_EXE=gpsign$(EXE_PREFIX)
 
 # Object Files
 PSERIAL_OBJ=$(PSERIAL_FILES:.c=.o)
 KERMIT_OBJ=$(KERMIT_FILES:.c=.o)
 UCMD_OBJ=$(UCMD_FILES:.c=.o)
 PUSB_OBJ=$(PUSB_FILES:.c=.o)
+GPSIGN_OBJ=$(GPSIGN_FILES:.c=.o)
 
 LIB_OBJ=$(LIB_FILES:.c=.o)
 
 CLEANUPFILES=$(PSERIAL_OBJ) $(LIB_OBJ) $(PSERIAL_EXE) $(GWART_OBJ)\
 			 $(KERMIT_EXE) $(KERMIT_OBJ) $(UCMD_OBJ) $(UCMD_EXE)\
-			 $(PUSB_EXE) $(PUSB_OBJ)
+			 $(PUSB_EXE) $(PUSB_OBJ) $(GPSIGN_EXE) $(GPSIGN_OBJ)
 
 CC=$(COMPILER_PREFIX)gcc
 LD=$(COMPILER_PREFIX)gcc
@@ -83,7 +86,7 @@ RM=$(APP_PREFIX)rm$(EXE_PREFIX)
 ECHO=$(APP_PREFIX)echo$(EXE_PREFIX)
 DOXYGEN=$(APP_PREFIX)doxygen$(EXE_PREFIX)
 
-CFLAGS=-Wall -O3 -Iinclude
+CFLAGS=-Wall -O3 -Iinclude -Ilib/lcfg
 LDFLAGS=
 
 CFLAGS+=-fdata-sections -ffunction-sections
@@ -108,7 +111,7 @@ endif
 
 .PHONY : all
 
-all: $(PSERIAL_EXE) $(KERMIT_EXE) $(UCMD_EXE)
+all: $(PSERIAL_EXE) $(KERMIT_EXE) $(UCMD_EXE) $(GPSIGN_EXE)
 
 usb: $(PUSB_EXE)
 
@@ -125,6 +128,11 @@ $(KERMIT_EXE): $(KERMIT_OBJ) $(LIB_OBJ) makefile
 $(UCMD_EXE): $(UCMD_OBJ) $(LIB_OBJ) makefile
 	@$(ECHO) "Generating:  $@"
 	$(if $(VERBOSE:1=),@)$(LD) $(UCMD_OBJ) $(LIB_OBJ) $(LDFLAGS) -o $@
+	@$(ECHO)
+
+$(GPSIGN_EXE): $(GPSIGN_OBJ) $(LIB_OBJ) makefile
+	@$(ECHO) "Generating:  $@"
+	$(if $(VERBOSE:1=),@)$(LD) $(GPSIGN_OBJ) $(LIB_OBJ) $(LDFLAGS) -o $@
 	@$(ECHO)
 
 $(PUSB_EXE): $(PUSB_OBJ) $(LIB_OBJ) makefile

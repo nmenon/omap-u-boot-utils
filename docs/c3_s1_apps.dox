@@ -7,4 +7,5 @@ U-Boot utilities provide the following apps:
  response to ASIC ID over USB connection.
 @li @subpage ub_ucmd - Send a command to U-Boot and wait till a specific match appears.
 @li @subpage ub_ukermit - Download a file from host without using kermit to U-Boot.
+@li @subpage ub_gpsign - Sign a image for booting with additional parameters.
 */

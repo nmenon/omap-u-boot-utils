@@ -14,10 +14,11 @@ Table of Contents:
 3) pserial help
 4) ukermit help
 5) ucmd help
-6) ucmd help
-7) Generic Example of usage
-8) Files and Directories
-9) Credits
+6) pusb help
+7) gpsign help
+8) Generic Example of usage
+9) Files and Directories
+10) Credits
 +----------------------------------------------------------------------------+
 
 IMPORTANT NOTE: This document is meant for folks who dont have generated
@@ -214,7 +215,31 @@ NOTE: it is required to run this program in sudo mode to get access at times
 Usage Example:
 Linux: sudo ./pusb -f u-boot.bin
 
-7) Generic Example of usage
+7) gpsign help
+==============
+App description:
+---------------
+generates a formatted image which may be used for
+nand, onenand or mmc boot on a OMAP GP device.
+This can also add a configuration header which
+allows for preconfiguration of various clock,ram
+GPMC or MMC settings prior to the image starting.
+
+Syntax:
+-------
+./gpsign [-c config file] [-l loadaddr] [-f input_file] [-?]
+Where:
+------
+-c config_file: CH configuration file[Default none]
+-l loadaddress: load address for result img[Default 0x40208800]
+-f input_file: input binary to sign[Default x-load.bin]
+-? : provide extended help including a sample config file
+------
+
+Usage Example:
+All OS: gpsign
+
+8) Generic Example of usage
 ===========================
 The following example is using U-Boot-V2. But it is not restricted to just
 that! My notes in [NOTE:] comments below
@@ -259,11 +284,13 @@ Match Found. Operation completed!
 [NOTE: you could embedd these in script files to automate commonly used
 operations such as flashing an image etc.. and ease up things a lot more]
 
-8) Files and Directories
+9) Files and Directories
 ========================
 . (Source Root. All final executables are generated here)
 |-- COPYING (Copy Right file ->READ THIS)
 |-- README (This file)
+|-- configs (Sample configuration files for boards)
+|   `-- sample.cfg
 |-- docs (documentation Directory)
 |   |-- c1_s1_main.dox
 |   |-- c2_s1_caveat.dox
@@ -287,19 +314,24 @@ operations such as flashing an image etc.. and ease up things a lot more]
 |   |-- file_posix.c (Linux/Mac OS/posix compilant file ops)
 |   |-- file_win32.c (Windows file ops)
 |   |-- f_status.c (show off status of operations)
+|   |-- lcfg (liblcfg library for configuration file handling)
+|   |   |-- README
+|   |   |-- lcfg_static.c
+|   |   `-- lcfg_static.h
 |   |-- serial_posix.c (Linux/Mac OS/posix Serial port ops)
 |   `-- serial_win32.c (Windows Serial port ops)
 |-- makefile (make file for build)
 `-- src (app source directory)
+    |-- gpserial.c (gpserial source)
     |-- pserial.c (pserial source)
     |-- ucmd.c (ucmd source)
-    |-- pusb.c (ucmd source)
+    |-- pusb.c (pusb source)
     `-- ukermit.c (ukermit source)
 
-4 directories, 26 files
+6 directories, 33 files
 
 
-9) Credits
+10) Credits
 ========================
 At the start of writing this code, there was no git, no svn, just zip files,
 so a couple of honorable mentions at this time:
@@ -308,4 +340,7 @@ http://groups.google.com/group/beagleboard/browse_thread/thread/ae2c601ebe104a4
 pusb is a scratch write but in general uses the same concepts
 
 Rob Clark - Mac OS support, tons of cleanups in serial code, and in general a
- willing experimenter with new ideas :)
+willing experimenter with new ideas :)
+
+Paul Baecher for writing liblcfg: http://liblcfg.carnivore.it/ - I recommend it
+to anyone looking for a quiet simple config file handling parser

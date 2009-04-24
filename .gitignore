@@ -1,6 +1,8 @@
 # Ignore libraries
 *.a
 *.o
+# Ignore swap files
+.*.swp
 # Ignore documentation
 docs/html/*
 docs/latex/*
@@ -10,3 +12,4 @@ pusb
 pserial
 ukermit
 ucmd
+gpsign
