@@ -577,7 +577,7 @@ int main(int argc, char *argv[])
 	unsigned long len;
 	struct stat sinfo;
 	unsigned int cmd_loadaddr = 0xFFFFFFFF;
-	char c;
+	int c;
 	char *appname = argv[0];
 
 	/* Default to x-load.bin and 0x40200800 and no config file */

@@ -164,7 +164,7 @@ int main(int argc, char **argv)
 	char *port = NULL;
 	char *second_file = NULL;
 	char *appname = argv[0];
-	char c;
+	int c;
 	/* Option validation */
 	opterr = 0;
 

@@ -154,7 +154,7 @@ int main(int argc, char **argv)
 	char *command = NULL;
 	char *expect = NULL;
 	char *appname = argv[0];
-	char c;
+	int c;
 	/* Option validation */
 	opterr = 0;
 

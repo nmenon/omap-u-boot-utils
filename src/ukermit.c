@@ -690,7 +690,7 @@ int main(int argc, char **argv)
 	char *port = NULL;
 	char *download_file = NULL;
 	char *appname = argv[0];
-	char c;
+	int c;
 	int ret = 0;
 	/* Option validation */
 	opterr = 0;
