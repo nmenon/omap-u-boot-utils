@@ -688,7 +688,9 @@ int main(int argc, char *argv[])
 	fwrite(&len, 1, 4, ofile);
 	fwrite(&loadaddr, 1, 4, ofile);
 	for (i = 0; i < len; i++) {
-		fread(&ch, 1, 1, ifile);
+		int z = fread(&ch, 1, 1, ifile);
+		if (!z)
+			APP_ERROR("no data?\n");
 		fwrite(&ch, 1, 1, ofile);
 	}
 
