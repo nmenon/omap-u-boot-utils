@@ -438,7 +438,7 @@ int main(int argc, char *argv[])
 	int new_dev = 0;
 	/* NOTE: mingw did not like this.. */
 	int c;
-	int filesize;
+	int filesize = -1;
 
 	program_name = argv[0];
 	/* Options supported:
