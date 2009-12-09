@@ -86,7 +86,7 @@ signed char s_open(char *t_port)
 	if (x == 0) {
 		S_ERROR("device %s being used already?\n", t_port);
 		sprintf(cmd, "lsof |grep %s", t_port);
-		system(cmd);
+		x = system(cmd);
 		return SERIAL_FAILED;
 	}
 	fd = open(t_port, O_RDWR | O_NOCTTY);
