@@ -38,7 +38,10 @@
 #include "file.h"
 #include "f_status.h"
 
-#define ASIC_ID_SIZE	58
+#define ASIC_ID_SIZE	7
+#define ASIC_ID_OMAP4430 0x4430
+#define ASIC_ID_OMAP3430 0x3430
+
 #define MAX_BUF		2048
 #define TOT_SIZE	MAX_BUF
 #define PRINT_SIZE	100
@@ -165,6 +168,8 @@ int main(int argc, char **argv)
 	char *second_file = NULL;
 	char *appname = argv[0];
 	int c;
+	int read_size = 0;
+	unsigned int asic_id = 0;
 	/* Option validation */
 	opterr = 0;
 
@@ -213,6 +218,13 @@ int main(int argc, char **argv)
 	/* Read ASIC ID */
 	printf("Waiting For Device ASIC ID: Press Ctrl+C to stop\n");
 	while (!ret) {
+		ret = s_read(buff, 1);
+		if (buff[0] != 0x04)
+			ret = 0;
+	}
+
+	ret = 0;
+	while (!ret) {
 		ret = s_read(buff, ASIC_ID_SIZE);
 		if ((ret != ASIC_ID_SIZE)) {
 			APP_ERROR("Did not read asic ID ret = %d\n", ret)
@@ -227,7 +239,43 @@ int main(int argc, char **argv)
 			printf("[%d] 0x%x[%c]\n", i, buff[i], buff[i]);
 	}
 #endif
-	printf("ASIC ID Detected.\n");
+	asic_id = (buff[3] << 8) + buff[4];
+	switch (asic_id) {
+	case ASIC_ID_OMAP4430:
+		printf("ASIC ID Detected: OMAP 4430 with ROM Version"
+			" 0x%02x%02x\n", buff[5], buff[6]);
+		read_size = 59;
+		break;
+	case ASIC_ID_OMAP3430:
+		printf("ASIC ID Detected: OMAP 3430 with ROM Version"
+			" 0x%02x%02x\n", buff[5], buff[6]);
+		read_size = 50;
+		break;
+	default:
+		printf("ASIC ID Detected: 0x%02x 0x%02x 0x%02x 0x%02x\n",
+			buff[3], buff[4], buff[5], buff[6]);
+		read_size = 50;
+		break;
+	}
+
+	ret = 0;
+	while (!ret) {
+		ret = s_read(buff, read_size);
+		if ((ret != read_size)) {
+			APP_ERROR("Did not read asic ID ret = %d\n", ret)
+			    s_close();
+			return ret;
+		}
+	}
+
+#if DEBUG
+	{
+		int i = 0;
+		for (i = 0; i < read_size; i++)
+			printf("[%d] 0x%x[%c]\n", i, buff[i], buff[i]);
+	}
+#endif
+
 	/* Send the Download command */
 	printf("Sending 2ndFile:\n");
 	ret =
