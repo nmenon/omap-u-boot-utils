@@ -33,6 +33,9 @@ Before using any tools, I would love to know it's limitations, hence the
 section 0 ;). some of the known caveats at the time of writing are:
 a) pusb does not yet work on windows. This is still a work in progress
 b) ukermit is cranky when used with large packets - it is disabled at the moment
+c) pserial can be used with most usb->rs232 adapters, however CH431 based
+   adapters are not support due to the fact that the linux kernel driver for
+   the CH341 does not support even parity.
 
 1) COMPILATION Environment:
 ===========================
