@@ -1,7 +1,7 @@
 #
 # Make file for compiling host app
 #
-# (C) Copyright 2008
+# (C) Copyright 2008-2010
 # Texas Instruments, <www.ti.com>
 # Nishanth Menon <nm@ti.com>
 #
@@ -57,6 +57,10 @@ KERMIT_FILES=src/ukermit.c
 UCMD_FILES=src/ucmd.c
 PUSB_FILES=src/pusb.c
 GPSIGN_FILES=src/gpsign.c
+TAGGER_FILES=src/tagger.c
+
+# Add all SOC/platform specific sty files here
+STY_FILES=src/asm/sty-omap3.S
 
 DOCS=docs/html docs/latex
 
@@ -66,6 +70,7 @@ KERMIT_EXE=ukermit$(EXE_PREFIX)
 UCMD_EXE=ucmd$(EXE_PREFIX)
 PUSB_EXE=pusb$(EXE_PREFIX)
 GPSIGN_EXE=gpsign$(EXE_PREFIX)
+TAGGER_EXE=tagger$(EXE_PREFIX)
 
 # Object Files
 PSERIAL_OBJ=$(PSERIAL_FILES:.c=.o)
@@ -73,12 +78,16 @@ KERMIT_OBJ=$(KERMIT_FILES:.c=.o)
 UCMD_OBJ=$(UCMD_FILES:.c=.o)
 PUSB_OBJ=$(PUSB_FILES:.c=.o)
 GPSIGN_OBJ=$(GPSIGN_FILES:.c=.o)
+TAGGER_OBJ=$(TAGGER_FILES:.c=.o)
 
 LIB_OBJ=$(LIB_FILES:.c=.o)
+STY_OBJS=$(STY_FILES:.S=.ao)
+STY_BINS=$(STY_FILES:.S=.bin)
 
 CLEANUPFILES=$(PSERIAL_OBJ) $(LIB_OBJ) $(PSERIAL_EXE) $(GWART_OBJ)\
 			 $(KERMIT_EXE) $(KERMIT_OBJ) $(UCMD_OBJ) $(UCMD_EXE)\
-			 $(PUSB_EXE) $(PUSB_OBJ) $(GPSIGN_EXE) $(GPSIGN_OBJ)
+			 $(PUSB_EXE) $(PUSB_OBJ) $(GPSIGN_EXE) $(GPSIGN_OBJ)\
+			 $(TAGGER_EXE) $(TAGGER_OBJ) $(STY_OBJS)
 
 CC=$(COMPILER_PREFIX)gcc
 LD=$(COMPILER_PREFIX)gcc
@@ -93,6 +102,10 @@ CFLAGS+=-fdata-sections -ffunction-sections
 LDFLAGS+=--gc-sections --print-gc-sections --stdlib
 LDFLAGS_USB=-lusb
 
+CROSS_CC ?=$(CROSS_COMPILE)gcc
+CROSS_OBJDUMP ?=$(CROSS_COMPILE)objdump
+CROSS_OBJCOPY ?=$(CROSS_COMPILE)objcopy
+
 ifdef DISABLE_COLOR
 CFLAGS+=-DDISABLE_COLOR
 endif
@@ -104,6 +117,13 @@ ifndef VERBOSE
   VERBOSE = 0
 endif
 
+%.ao: %.S
+	@$(ECHO) "Cross Compiling: " $<
+	$(if $(VERBOSE:1=),@)$(CROSS_CC) $(CFLAGS) -o $@ -c $<
+
+%.bin: %.ao %.S
+	@$(ECHO) "Generating Crossbin: " $<
+	$(if $(VERBOSE:1=),@)$(CROSS_OBJCOPY) -O binary $< $@
 
 %.o: %.c
 	@$(ECHO) "Compiling: " $<
@@ -111,9 +131,12 @@ endif
 
 .PHONY : all
 
-all: $(PSERIAL_EXE) $(KERMIT_EXE) $(UCMD_EXE) $(GPSIGN_EXE)
+all: $(PSERIAL_EXE) $(KERMIT_EXE) $(UCMD_EXE) $(GPSIGN_EXE) $(TAGGER_EXE)
 
 usb: $(PUSB_EXE)
+
+sty: $(STY_BINS)
+	@$(ECHO) "Completed all sty files"
 
 $(PSERIAL_EXE): $(PSERIAL_OBJ) $(LIB_OBJ) makefile
 	@$(ECHO) "Generating:  $@"
@@ -133,6 +156,11 @@ $(UCMD_EXE): $(UCMD_OBJ) $(LIB_OBJ) makefile
 $(GPSIGN_EXE): $(GPSIGN_OBJ) $(LIB_OBJ) makefile
 	@$(ECHO) "Generating:  $@"
 	$(if $(VERBOSE:1=),@)$(LD) $(GPSIGN_OBJ) $(LIB_OBJ) $(LDFLAGS) -o $@
+	@$(ECHO)
+
+$(TAGGER_EXE): $(TAGGER_OBJ) $(LIB_OBJ) makefile
+	@$(ECHO) "Generating:  $@"
+	$(if $(VERBOSE:1=),@)$(LD) $(TAGGER_OBJ) $(LIB_OBJ) $(LDFLAGS) -o $@
 	@$(ECHO)
 
 $(PUSB_EXE): $(PUSB_OBJ) $(LIB_OBJ) makefile
@@ -159,7 +187,7 @@ ifndef WINDOWS
 	$(if $(VERBOSE:1=),@)find $(srctree) $(RCS_FIND_IGNORE) \
 		\( -name '*.orig' -o -name '*.rej' -o -name '*~' \
 		-o -name '*.bak' -o -name '#*#' -o -name '.*.orig' \
-		-o -name '.*.rej' -o -size 0 \
+		-o -name '.*.rej' -o -size 0 -o -name "*.ao"\
 		-o -name '*%' -o -name '.*.cmd' -o -name 'core' \) \
 		-type f -print | xargs rm -$(if $(VERBOSE:1=),,v)f
 endif
