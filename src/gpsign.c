@@ -41,6 +41,7 @@
 
 #include "lcfg_static.h"
 #include "rev.h"
+#include "compare.h"
 
 #define CONFIG_FILE_ARG "c"
 #define CONFIG_FILE_ARG_C 'c'
@@ -215,15 +216,6 @@ static struct ch_ram platform_chram;
 static struct ch_flash platform_chflash;
 static struct ch_mmcsd platform_chmmcsd;
 unsigned int loadaddr;
-
-#define TYPE_U8 1
-#define TYPE_U16 2
-#define TYPE_U32 3
-struct compare_map {
-	char *name;
-	void *variable;
-	int type;
-};
 static struct compare_map variable_map[] = {
 /* *INDENT-OFF* */
 	/* GENERAL SETTINGS */
@@ -376,81 +368,6 @@ static int fillup_ch(void)
 }
 
 /**
- * @brief gpsign_eventhandler - this is the parser logic
- *
- * This provides a hook for the lcfg library to call when a
- * match is found for a specific keypair
- *
- * @param key key string
- * @param data data buffer
- * @param len length of the data buffer
- * @param user_data any specifics
- *
- * @return error if it did not match our dictionary or a data overflow,
- * else success
- */
-static enum lcfg_status gpsign_eventhandler(const char *key, void *data,
-					    size_t len, void *user_data)
-{
-	int i;
-	struct compare_map *c = NULL;
-	const char *str = (const char *)data;
-	int ret = 0;
-	unsigned int val = 1, max_val;
-	for (i = 0; i < sizeof(variable_map) / sizeof(struct compare_map); i++) {
-		c = &variable_map[i];
-		if (!strcmp(c->name, key)) {
-			val = 0;
-			break;
-		}
-	}
-
-	if (val) {
-		APP_ERROR("unsupported variable:%s in config file\n", key)
-		    return lcfg_status_error;
-	}
-	switch (c->type) {
-	case TYPE_U32:
-	case TYPE_U16:
-	case TYPE_U8:
-		ret = sscanf(str, "%x", &val);
-		if (!ret) {
-			APP_ERROR("scanf failed for key %s and data %s\n", key,
-				  str)
-			    return lcfg_status_error;
-		}
-		max_val = 0xFFFFFFFF;
-		if (c->type == TYPE_U32)
-			*((unsigned int *)c->variable) = val;
-		else if (c->type == TYPE_U16) {
-			max_val = 0xFFFF;
-			*((unsigned short *)c->variable) = (unsigned short)val;
-		} else if (c->type == TYPE_U8) {
-			max_val = 0xFF;
-			*((unsigned char *)c->variable) = (unsigned char)val;
-		} else {
-			APP_ERROR("%s:%s():%d:Key %s type %d unhandled->"
-				  "please email developer with this message\n",
-				  __FILE__, __FUNCTION__, __LINE__, c->name,
-				  c->type)
-		}
-		if (val > max_val) {
-			APP_ERROR("Config File error: in key %s, value 0x%08X "
-				  "is greater than maximum allowed value 0x%08X"
-				  "\n", c->name, val, max_val)
-			    return lcfg_status_error;
-		}
-
-		break;
-	default:
-		APP_ERROR("Unknown type??\n")
-		    return lcfg_status_error;
-
-	}
-	return lcfg_status_ok;
-}
-
-/**
  * @brief usage - help info
  *
  * @param appname my name
@@ -495,7 +412,7 @@ static void usage(char *appname, int extend)
 		memset(line, '-', sizeof(line));
 		line[sizeof(line) - 1] = 0;
 		printf("\nExtended help\n" "---------------\n"
-		       "Configuration options allowed in config file:\n");
+		       "Configuration options used from config file:\n");
 		printf("+%s+\n| %-49s | %5s |\n+%s+\n", line,
 		       "Section.Variable_name", "size", line);
 		for (i = 0;
@@ -641,7 +558,9 @@ int main(int argc, char *argv[])
 		}
 		stat = lcfg_parse(c);
 		if (stat == lcfg_status_ok) {
-			lcfg_accept(c, gpsign_eventhandler, 0);
+			variable_map_g= variable_map;
+			size_var_map = sizeof(variable_map)/sizeof(struct compare_map);
+			lcfg_accept(c, compare_eventhandler, 0);
 		} else {
 			APP_ERROR("Config file %s: %s\n", cfile,
 				  lcfg_error_get(c))
