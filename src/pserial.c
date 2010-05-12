@@ -51,6 +51,8 @@
 #define PORT_ARG_C	'p'
 #define SEC_ARG		"f"
 #define SEC_ARG_C	'f'
+#define VERBOSE_ARG	"v"
+#define VERBOSE_ARG_C	'v'
 
 /**
  * @brief send_file - send a file to the host
@@ -139,12 +141,14 @@ static void usage(char *appname)
 	       "response to ASIC ID over serial port\n\n"
 	       "Syntax:\n"
 	       "------\n"
-	       "%s -" PORT_ARG " portName -" SEC_ARG " fileToDownload\n\n"
+	       "%s -" PORT_ARG " portName -" SEC_ARG " fileToDownload [-"
+	       VERBOSE_ARG "]\n\n"
 	       "Where:\n" "-----\n"
 	       "portName - RS232 device being used. Example: " PORT_NAME "\n"
 	       "fileToDownload - file to be downloaded as response to "
-	       "asic id\n\n"
-	       "Usage Example:\n" "-------------\n"
+	       "asic id\n"
+	       "-"VERBOSE_ARG " - print complete ASIC id dump(optional)\n"
+	       "\nUsage Example:\n" "-------------\n"
 	       "%s -" PORT_ARG " " PORT_NAME " -" SEC_ARG " " F_NAME "\n",
 	       appname, appname);
 	REVPRINT();
@@ -171,11 +175,16 @@ int main(int argc, char **argv)
 	int c;
 	int read_size = 0;
 	unsigned int asic_id = 0;
+	char verbose = 0;
 	/* Option validation */
 	opterr = 0;
 
-	while ((c = getopt(argc, argv, PORT_ARG ":" SEC_ARG ":")) != -1)
+	while ((c = getopt(argc, argv, PORT_ARG ":" SEC_ARG ":" VERBOSE_ARG)) !=
+			-1)
 		switch (c) {
+		case VERBOSE_ARG_C:
+			verbose = 1;
+			break;
 		case PORT_ARG_C:
 			port = optarg;
 			break;
@@ -233,13 +242,11 @@ int main(int argc, char **argv)
 			return ret;
 		}
 	}
-#ifdef DEBUG
-	{
+	if (verbose) {
 		int i = 0;
 		for (i = 0; i < ASIC_ID_SIZE; i++)
 			printf("[%d] 0x%x[%c]\n", i, buff[i], buff[i]);
 	}
-#endif
 	asic_id = (buff[3] << 8) + buff[4];
 	switch (asic_id) {
 	case ASIC_ID_OMAP4430:
@@ -270,13 +277,11 @@ int main(int argc, char **argv)
 		}
 	}
 
-#if DEBUG
-	{
+	if (verbose) {
 		int i = 0;
 		for (i = 0; i < read_size; i++)
 			printf("[%d] 0x%x[%c]\n", i, buff[i], buff[i]);
 	}
-#endif
 
 	/* Send the Download command */
 	printf("Sending 2ndFile:\n");
