@@ -41,6 +41,7 @@
 #define ASIC_ID_SIZE	7
 #define ASIC_ID_OMAP4430 0x4430
 #define ASIC_ID_OMAP3430 0x3430
+#define ASIC_ID_OMAP3630 0x3630
 
 #define MAX_BUF		2048
 #define TOT_SIZE	MAX_BUF
@@ -247,8 +248,9 @@ int main(int argc, char **argv)
 		read_size = 59;
 		break;
 	case ASIC_ID_OMAP3430:
-		printf("ASIC ID Detected: OMAP 3430 with ROM Version"
-			" 0x%02x%02x\n", buff[5], buff[6]);
+	case ASIC_ID_OMAP3630:
+		printf("ASIC ID Detected: OMAP %04x with ROM Version"
+			" 0x%02x%02x\n", asic_id, buff[5], buff[6]);
 		read_size = 50;
 		break;
 	default:
