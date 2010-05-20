@@ -94,7 +94,7 @@ int f_status_show(signed long cur_size)
 		back_buff[off] = BACK_SPACE_CHAR;
 	}
 	sprintf(print_buff,
-		"Downloading file: %.03f%% completed(%ld/%ld bytes)", percent,
+		"Downloading file: %.03f%% completed (%ld/%ld bytes)", percent,
 		cur_size, tsize);
 	printf("%s", print_buff);
 	fflush(stdout);

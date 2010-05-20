@@ -486,7 +486,7 @@ int main(int argc, char *argv[])
 	usb_init();
 	old_bus = usb_find_busses();
 	old_dev = 0;
-	N_PRINT("Waiting for USB device vendorID=0x%X"
+	N_PRINT("Waiting for USB device vendorID=0x%X "
 		"and productID=0x%X:\n", search_vendor, search_product);
 	while (!found) {
 		/* Enumerate buses once more.. just in case
