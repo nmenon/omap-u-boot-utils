@@ -58,8 +58,11 @@
 #define INTERFACE_INDEX_DEFAULT	0x0
 #define DEVICE_IN_ENDPOINT		0x81
 #define DEVICE_OUT_ENDPOINT		0x1
-#define ASICID_SIZE				69	/* 1+7+4+23+23+11 */
+#define ASICID_SIZE_OMAP3		69	/* 1+7+4+23+23+11 */
+#define ASICID_SIZE_OMAP4		81	/* 1+7+4+23+35+11 */
 #define ASIC_ID_TIMEOUT			100
+#define COMMAND_SIZE			4
+#define GET_ASICID_COMMAND		0xF0030003
 #define DOWNLOAD_COMMAND		0xF0030002
 #define MAX_SIZE				(64 * 1024)
 #define READ_BUFFER_SIZE		4096
@@ -69,6 +72,7 @@
 #define N_PRINT(ARGS...) if (verbose >= 0) printf(ARGS)
 
 static int verbose = 0;
+static int asicid_size = ASICID_SIZE_OMAP3;
 static unsigned int search_vendor = SEARCH_VENDOR_DEFAULT;
 static unsigned int search_product = SEARCH_PRODUCT_DEFAULT;
 static int config_idx = CONFIG_INDEX_DEFAULT;
@@ -275,6 +279,22 @@ int configure_device(struct usb_device *dev)
 	return 0;
 }
 
+/* send commands to the boot rom; returns 0 on success */
+static int send_command(usb_dev_handle *udev, unsigned int command)
+{
+	int ret =
+	    usb_bulk_write(udev, DEVICE_OUT_ENDPOINT, (char *)&command,
+			   sizeof(command), ASIC_ID_TIMEOUT);
+	if (ret != COMMAND_SIZE) {
+		APP_ERROR
+		    ("CMD:Expected to write %ld, "
+		     "actual write %d - err str: %s\n",
+		     (long int)sizeof(command), ret, strerror(errno));
+	}
+
+	return !(ret == COMMAND_SIZE);
+}
+
 /*************** ACTUAL TRANSMISSION OF FILE *****************/
 int send_file(struct usb_device *dev, char *f_name)
 {
@@ -282,9 +302,8 @@ int send_file(struct usb_device *dev, char *f_name)
 	int ret = 0;
 	unsigned long cur_size = 0;
 	unsigned int filesize;
-	char asic_buffer[ASICID_SIZE];
+	char asic_buffer[ASICID_SIZE_OMAP4];
 	char read_buffer[READ_BUFFER_SIZE];
-	unsigned int command = DOWNLOAD_COMMAND;
 	int fail = 0;
 
 	filesize = f_size(f_name);
@@ -315,34 +334,39 @@ int send_file(struct usb_device *dev, char *f_name)
 			  strerror(errno));
 		return (ret);
 	}
+
 	/* read ASIC ID */
 	ret =
-	    usb_bulk_read(udev, DEVICE_IN_ENDPOINT, asic_buffer, ASICID_SIZE,
+	    usb_bulk_read(udev, DEVICE_IN_ENDPOINT, asic_buffer, asicid_size,
 			  ASIC_ID_TIMEOUT);
-	if (ret != ASICID_SIZE) {
+	/* if no ASIC ID, request it explicitly */
+	if (ret != asicid_size && send_command(udev, GET_ASICID_COMMAND)) {
+		APP_ERROR("Can't get ASIC ID out of the wretched chip.\n");
+		fail = -1;
+		goto closeup;
+	}
+
+	/* now try again */
+	ret =
+	    usb_bulk_read(udev, DEVICE_IN_ENDPOINT, asic_buffer, asicid_size,
+			  ASIC_ID_TIMEOUT);
+	if (ret != asicid_size) {
 		APP_ERROR("Expected to read %d, read %d - err str: %s\n",
-			  ASICID_SIZE, ret, strerror(errno));
+			  asicid_size, ret, strerror(errno));
 		fail = -1;
 		goto closeup;
 	}
 	if (verbose > 0) {
 		int i = 0;
 		printf("ASIC ID:\n");
-		while (i < ASICID_SIZE) {
+		while (i < asicid_size) {
 			printf("%d: 0x%x[%c]\n", i, asic_buffer[i],
 			       asic_buffer[i]);
 			i++;
 		}
 	}
 	/* Send the  Continue Peripheral boot command */
-	ret =
-	    usb_bulk_write(udev, DEVICE_OUT_ENDPOINT, (char *)&command,
-			   sizeof(command), ASIC_ID_TIMEOUT);
-	if (ret != sizeof(command)) {
-		APP_ERROR
-		    ("CMD:Expected to write %ld, "
-		     "actual write %d - err str: %s\n",
-		     (long int)sizeof(command), ret, strerror(errno));
+	if (send_command(udev, DOWNLOAD_COMMAND)) {
 		fail = -1;
 		goto closeup;
 	}
@@ -447,7 +471,7 @@ int main(int argc, char *argv[])
 	 *  -v -verbose
 	 *  -q -ultraquiet
 	 */
-	while ((c = getopt(argc, argv, ":vVqd:f:")) != -1) {
+	while ((c = getopt(argc, argv, ":vVqd:f:4")) != -1) {
 		switch (c) {
 		case 'q':
 			verbose = -1;
@@ -463,6 +487,9 @@ int main(int argc, char *argv[])
 			break;
 		case 'd':
 			sscanf(optarg, "%x", &search_product);
+			break;
+		case '4':
+			asicid_size = ASICID_SIZE_OMAP4;
 			break;
 		case '?':
 		default:
