@@ -213,11 +213,13 @@ int main(int argc, char **argv)
 	}
 
 	/* Setup the port */
+	if (verbose) printf("Opening serial port: %s\n", port);
 	ret = s_open(port);
 	if (ret != SERIAL_OK) {
 		APP_ERROR("serial open failed\n")
 		    return ret;
 	}
+	if (verbose) printf("Configuring serial port\n");
 	ret = s_configure(115200, EVENPARITY, ONE_STOP_BIT, 8);
 	if (ret != SERIAL_OK) {
 		s_close();
