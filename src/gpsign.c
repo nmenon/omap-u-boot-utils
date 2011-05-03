@@ -36,7 +36,9 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <string.h>
+#ifndef __APPLE__
 #include <malloc.h>
+#endif
 #include <ctype.h>
 
 #include "lcfg_static.h"
