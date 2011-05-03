@@ -207,7 +207,9 @@ signed char s_configure(unsigned long s_baud_rate, unsigned char s_parity,
 	newtio.c_lflag = 0;
 	newtio.c_cc[VTIME] = VTIME_SET;
 	newtio.c_cc[VMIN] = 1;
+#ifdef VSWTC
 	newtio.c_cc[VSWTC] = 0;
+#endif
 	ret = tcflush(fd, TCIFLUSH);
 	if (ret < 0) {
 		S_ERROR("failed to set flush buffers\n");
