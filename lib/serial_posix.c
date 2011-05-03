@@ -89,7 +89,7 @@ signed char s_open(char *t_port)
 		x = system(cmd);
 		return SERIAL_FAILED;
 	}
-	fd = open(t_port, O_RDWR | O_NOCTTY);
+	fd = open(t_port, O_RDWR | O_NOCTTY | O_NDELAY);
 	if (fd < 0) {
 		S_ERROR("failed to open %s\n", t_port);
 		perror(t_port);
