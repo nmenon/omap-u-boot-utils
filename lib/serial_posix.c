@@ -317,7 +317,7 @@ signed int s_read(unsigned char *p_buffer, unsigned long size)
 		return SERIAL_FAILED;
 	}
 
-	S_INFO("Serial read requested=%d, read=%d\n", size, ret);
+	S_INFO("Serial read requested=%lu, read=%d\n", size, ret);
 	return ret;
 }
 
