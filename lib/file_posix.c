@@ -127,3 +127,22 @@ signed int f_read(unsigned char *buffer, unsigned int read_size)
 	F_INFO("read operation returned %d\n", ret);
 	return ret;
 }
+
+/**
+ * @brief f_seek - seek to location in file
+ *
+ * @param offset in file
+ *
+ * @return status
+ */
+int f_seek(long offset)
+{
+	int ret;
+	if (file == NULL) {
+		F_ERROR("file is not open\n");
+		return FILE_ERROR;
+	}
+	ret = fseek(file, offset, SEEK_SET);
+	F_INFO("seek operation returned %d\n", ret);
+	return ret;
+}

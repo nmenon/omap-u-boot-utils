@@ -37,5 +37,6 @@ signed long f_size(const char *f_name);
 signed char f_open(const char *f_name);
 signed char f_close(void);
 signed int f_read(unsigned char *buffer, unsigned int read_size);
+int f_seek(long offset);
 
 #endif				/* __FILE__H_ */
