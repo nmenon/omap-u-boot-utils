@@ -43,7 +43,7 @@
 #define ASIC_ID_OMAP3430 0x3430
 #define ASIC_ID_OMAP3630 0x3630
 
-#define MAX_BUF		2048
+#define MAX_BUF		1024
 #define TOT_SIZE	MAX_BUF
 #define PRINT_SIZE	100
 
