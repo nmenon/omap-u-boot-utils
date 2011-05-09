@@ -43,7 +43,7 @@
 #define ASIC_ID_OMAP3430 0x3430
 #define ASIC_ID_OMAP3630 0x3630
 
-#define MAX_BUF		2048
+#define MAX_BUF		1024
 #define TOT_SIZE	MAX_BUF
 #define PRINT_SIZE	100
 
@@ -213,11 +213,13 @@ int main(int argc, char **argv)
 	}
 
 	/* Setup the port */
+	if (verbose) printf("Opening serial port: %s\n", port);
 	ret = s_open(port);
 	if (ret != SERIAL_OK) {
 		APP_ERROR("serial open failed\n")
 		    return ret;
 	}
+	if (verbose) printf("Configuring serial port\n");
 	ret = s_configure(115200, EVENPARITY, ONE_STOP_BIT, 8);
 	if (ret != SERIAL_OK) {
 		s_close();

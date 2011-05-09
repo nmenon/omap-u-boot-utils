@@ -89,7 +89,7 @@ signed char s_open(char *t_port)
 		x = system(cmd);
 		return SERIAL_FAILED;
 	}
-	fd = open(t_port, O_RDWR | O_NOCTTY);
+	fd = open(t_port, O_RDWR | O_NOCTTY | O_NDELAY);
 	if (fd < 0) {
 		S_ERROR("failed to open %s\n", t_port);
 		perror(t_port);
@@ -207,7 +207,9 @@ signed char s_configure(unsigned long s_baud_rate, unsigned char s_parity,
 	newtio.c_lflag = 0;
 	newtio.c_cc[VTIME] = VTIME_SET;
 	newtio.c_cc[VMIN] = 1;
+#ifdef VSWTC
 	newtio.c_cc[VSWTC] = 0;
+#endif
 	ret = tcflush(fd, TCIFLUSH);
 	if (ret < 0) {
 		S_ERROR("failed to set flush buffers\n");
@@ -315,7 +317,7 @@ signed int s_read(unsigned char *p_buffer, unsigned long size)
 		return SERIAL_FAILED;
 	}
 
-	S_INFO("Serial read requested=%d, read=%d\n", size, ret);
+	S_INFO("Serial read requested=%lu, read=%d\n", size, ret);
 	return ret;
 }
 
