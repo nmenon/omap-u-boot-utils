@@ -72,6 +72,7 @@ signed char s_open(char *t_port)
 {
 	int x;
 	char cmd[200];
+	int fd_flags;
 	if (fd) {
 		S_ERROR("Port is already open\n");
 		return SERIAL_FAILED;
@@ -89,9 +90,23 @@ signed char s_open(char *t_port)
 		x = system(cmd);
 		return SERIAL_FAILED;
 	}
-	fd = open(t_port, O_RDWR | O_NOCTTY);
+	fd = open(t_port, O_RDWR | O_NOCTTY | O_NONBLOCK);
 	if (fd < 0) {
 		S_ERROR("failed to open %s\n", t_port);
+		perror(t_port);
+		return SERIAL_FAILED;
+	}
+	fd_flags = fcntl (fd, F_GETFL);
+	if (fd_flags == -1)
+	{
+		S_ERROR("failed to get state of %s\n", t_port);
+		perror(t_port);
+		return SERIAL_FAILED;
+	}
+	x = fcntl (fd, F_SETFL, fd_flags & ~O_NONBLOCK);
+	if (x == -1)
+	{
+		S_ERROR("failed to set state of %s\n", t_port);
 		perror(t_port);
 		return SERIAL_FAILED;
 	}
