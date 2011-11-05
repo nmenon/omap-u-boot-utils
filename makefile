@@ -99,7 +99,7 @@ CFLAGS=-Wall -O3 -Iinclude -Ilib/lcfg
 LDFLAGS=
 
 CFLAGS+=-fdata-sections -ffunction-sections
-LDFLAGS+=-Wl,--gc-sections -Wl,--print-gc-sections --stdlib
+LDFLAGS+=-Wl,--gc-sections -Wl,--print-gc-sections
 LDFLAGS_USB=-lusb
 
 CROSS_CC ?=$(CROSS_COMPILE)gcc
