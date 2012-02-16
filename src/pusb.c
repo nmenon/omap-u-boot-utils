@@ -457,7 +457,6 @@ int main(int argc, char *argv[])
 	char *filename = NULL;
 	int found = 0;
 	int x = 0;
-	int old_bus = 0;
 	int old_dev = 0;
 	int new_dev = 0;
 	/* NOTE: mingw did not like this.. */
@@ -511,7 +510,7 @@ int main(int argc, char *argv[])
 		usb_set_debug(255);
 	}
 	usb_init();
-	old_bus = usb_find_busses();
+	usb_find_busses();
 	old_dev = 0;
 	N_PRINT("Waiting for USB device vendorID=0x%X "
 		"and productID=0x%X:\n", search_vendor, search_product);
