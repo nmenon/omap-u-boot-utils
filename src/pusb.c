@@ -339,22 +339,23 @@ int send_file(struct usb_device *dev, char *f_name)
 	ret =
 	    usb_bulk_read(udev, DEVICE_IN_ENDPOINT, asic_buffer, asicid_size,
 			  ASIC_ID_TIMEOUT);
-	/* if no ASIC ID, request it explicitly */
-	if (ret != asicid_size && send_command(udev, GET_ASICID_COMMAND)) {
-		APP_ERROR("Can't get ASIC ID out of the wretched chip.\n");
-		fail = -1;
-		goto closeup;
-	}
 
-	/* now try again */
-	ret =
-	    usb_bulk_read(udev, DEVICE_IN_ENDPOINT, asic_buffer, asicid_size,
-			  ASIC_ID_TIMEOUT);
+	/* if no ASIC ID, request it explicitly */
 	if (ret != asicid_size) {
-		APP_ERROR("Expected to read %d, read %d - err str: %s\n",
-			  asicid_size, ret, strerror(errno));
-		fail = -1;
-		goto closeup;
+		if (send_command(udev, GET_ASICID_COMMAND)) {
+			APP_ERROR("Can't get ASIC ID out of the wretched chip.\n");
+			fail = -1;
+			goto closeup;
+		}
+		/* now try again */
+		ret = usb_bulk_read(udev, DEVICE_IN_ENDPOINT, asic_buffer,
+				    asicid_size, ASIC_ID_TIMEOUT);
+		if (ret != asicid_size) {
+			APP_ERROR("Expected to read %d, read %d - err str: %s\n",
+				  asicid_size, ret, strerror(errno));
+			fail = -1;
+			goto closeup;
+		}
 	}
 	if (verbose > 0) {
 		int i = 0;
