@@ -137,6 +137,8 @@
 #define DNLD_ARG_C		'f'
 #define DLY_ARG			"d"
 #define DLY_ARG_C		'd'
+#define SILENT_STAT_ARG		"q"
+#define SILENT_STAT_C		'q'
 
 #ifdef LARGE_PACKETS_ENABLE
 struct kermit_data_header_large {
@@ -560,7 +562,7 @@ static signed int kermit_ack_type(int seq_num)
  *
  * @return -success/failure
  */
-static signed int k_send_data(char *f_name)
+static signed int k_send_data(char *f_name, int silent_status)
 {
 	unsigned char sequence = 0;
 	unsigned int send_size = MAX_CHUNK;
@@ -580,7 +582,10 @@ static signed int k_send_data(char *f_name)
 		APP_ERROR("File Open failed!File Exists & readable?\n")
 		    return -1;
 	}
-	f_status_init(ori_size, NORMAL_PRINT);
+	if (!silent_status)
+		f_status_init(ori_size, NORMAL_PRINT);
+	else
+		COLOR_PRINT(BLUE, "Transfer start (%ld bytes)\n", ori_size);
 	while (size) {
 		send_size = (size > MAX_CHUNK) ? MAX_CHUNK : size;
 		send_size = f_read((unsigned char *)buffer, send_size);
@@ -632,13 +637,16 @@ static signed int k_send_data(char *f_name)
 			sequence = 0;
 
 		size -= send_size;
-		f_status_show(ori_size - size);
+		if (!silent_status)
+			f_status_show(ori_size - size);
 	}
 	/* Send the completion char */
 	s1_sendpacket(&done_transmit, 1);
 	if (f_close() != FILE_OK) {
 		APP_ERROR("File Close failed\n")
 	}
+	if (silent_status)
+		COLOR_PRINT(GREEN, "Transfer complete\n");
 	return 0;
 }
 
@@ -665,11 +673,12 @@ static void usage(char *appname)
 	       "Syntax:\n"
 	       "------\n"
 	       "%s -" PORT_ARG " portName -" DNLD_ARG " fileToDownload"
-	       " [-" DLY_ARG " delay_time]\n\n"
+	       " [-" DLY_ARG " delay_time] [-" SILENT_STAT_ARG "]\n\n"
 	       "Where:\n" "-----\n"
 	       "portName - RS232 device being used. Example: " PORT_NAME "\n"
 	       "fileToDownload - file to be downloaded\n\n"
 	       "delay_time - delay time in ms for ack reciept(optional)\n\n"
+	       SILENT_STAT_ARG "- quiet status download status\n\n"
 	       "Usage Example:\n" "-------------\n"
 	       "%s -" PORT_ARG " " PORT_NAME " -" DNLD_ARG " " F_NAME "\n",
 	       appname, appname);
@@ -692,12 +701,14 @@ int main(int argc, char **argv)
 	char *appname = argv[0];
 	int c;
 	int ret = 0;
+	int silent = 0;
+
 	/* Option validation */
 	opterr = 0;
 
 	while ((c =
 		getopt(argc, argv,
-		       DLY_ARG ":" PORT_ARG ":" DNLD_ARG ":")) != -1)
+		       DLY_ARG ":" PORT_ARG ":" DNLD_ARG ":" SILENT_STAT_ARG)) != -1)
 		switch (c) {
 		case DLY_ARG_C:
 			sscanf(optarg, "%d", &delay);
@@ -707,6 +718,9 @@ int main(int argc, char **argv)
 			break;
 		case DNLD_ARG_C:
 			download_file = optarg;
+			break;
+		case SILENT_STAT_C:
+			silent = 1;
 			break;
 		case '?':
 			if ((optopt == DNLD_ARG_C) || (optopt == PORT_ARG_C)) {
@@ -743,7 +757,7 @@ int main(int argc, char **argv)
 	}
 
 	s_flush(NULL, NULL);
-	ret = k_send_data(download_file);
+	ret = k_send_data(download_file, silent);
 	if (ret != 0) {
 		s_close();
 		APP_ERROR("Data transmit failed\n")
