@@ -51,6 +51,8 @@
 #define IMAGE_FILE_ARG_C 'f'
 #define LOAD_ADDRESS_ARG "l"
 #define LOAD_ADDRESS_ARG_C 'l'
+#define PAGE_4K_ARG "4"
+#define PAGE_4K_ARG_C '4'
 
 /********************** CHSETTINGS STRUCTURES *****************************/
 #define CH_SETTINGS "CHSETTINGS"
@@ -210,6 +212,8 @@ struct ch_mmcsd {
 #define CH_M_BUS_WIDTH_NOUPDATE		0xFFFFFFFF
 	u32 bus_width;		/* 0xC */
 } __attribute__ ((__packed__));
+
+#define PAGE_PAD_SIZE	2048
 
 /********************** VARIABLES *****************************/
 static u8 ch_buffer[512];
@@ -388,13 +392,15 @@ static void usage(char *appname, int extend)
 	       "GPMC or MMC settings prior to the image starting.\n"
 	       "Syntax:\n"
 	       "%s [-" CONFIG_FILE_ARG " config file] [-" LOAD_ADDRESS_ARG
-	       " loadaddr] [-" IMAGE_FILE_ARG " input_file] [-?]\n"
+	       " loadaddr] [-" PAGE_4K_ARG "] [-" IMAGE_FILE_ARG " input_file]"
+	       "[-?]\n"
 	       "Where:\n"
 	       "------\n"
 	       " -" CONFIG_FILE_ARG " config_file: CH configuration file "
 	       "[Default none]\n"
 	       " -" LOAD_ADDRESS_ARG " loadaddress: load address for result "
 	       "image [Default 0x40208800]\n"
+	       " -" PAGE_4K_ARG " 4096 bytes flash page size [Default 2048]\n"
 	       " -" IMAGE_FILE_ARG " input_file: input binary to sign "
 	       "[Default x-load.bin]\n"
 	       " -? : provide extended help including a sample config file\n"
@@ -496,6 +502,8 @@ int main(int argc, char *argv[])
 	unsigned long len;
 	struct stat sinfo;
 	unsigned int cmd_loadaddr = 0xFFFFFFFF;
+	int page_size_4k = 0;
+	char *page_pad = NULL;
 	int c;
 	char *appname = argv[0];
 
@@ -507,7 +515,7 @@ int main(int argc, char *argv[])
 	while ((c =
 		getopt(argc, argv,
 		       CONFIG_FILE_ARG ":" IMAGE_FILE_ARG ":" LOAD_ADDRESS_ARG
-		       ":")) != -1)
+		       ":" PAGE_4K_ARG)) != -1)
 		switch (c) {
 		case CONFIG_FILE_ARG_C:
 			cfile = optarg;
@@ -517,6 +525,15 @@ int main(int argc, char *argv[])
 			break;
 		case LOAD_ADDRESS_ARG_C:
 			sscanf(optarg, "%x", &cmd_loadaddr);
+			break;
+		case PAGE_4K_ARG_C:
+			page_size_4k = 1;
+			page_pad = malloc(PAGE_PAD_SIZE);
+			if (!page_pad) {
+				APP_ERROR("Out of memory\n");
+				exit(0);
+			}
+			memset(page_pad, 0xff, PAGE_PAD_SIZE);
 			break;
 		case '?':
 			i = 0;
@@ -612,6 +629,11 @@ int main(int argc, char *argv[])
 		int z = fread(&ch, 1, 1, ifile);
 		if (!z)
 			APP_ERROR("no data?\n");
+		if (page_size_4k) {
+			/* Account for 8 bytes header */
+			if (i > 8 && !(((i + 8) % PAGE_PAD_SIZE)))
+				fwrite(page_pad, PAGE_PAD_SIZE, 1, ofile);
+		}
 		fwrite(&ch, 1, 1, ofile);
 	}
 
