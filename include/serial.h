@@ -39,6 +39,7 @@ signed int s_write(unsigned char *p_buffer, unsigned long size);
 signed int s_getc(void);
 signed int s_putc(char x);
 signed int s_flush(unsigned int *rx_left, unsigned int *tx_left);
+signed int s_break(int sec_stay, int sec_post);
 
 #define SERIAL_OK 0
 #define SERIAL_FAILED -1

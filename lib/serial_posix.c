@@ -39,6 +39,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <errno.h>
+#include <sys/ioctl.h>
 
 #include <serial.h>
 #include <common.h>
@@ -403,3 +404,33 @@ signed int s_putc(char x)
 	}
 	return x;
 }
+
+/**
+ * @brief s_break - Send a break event
+ *
+ * @param sec_stay: how long to keep the break condition?
+ * @param sec_post: how long to wait after break?
+ *
+ * @return success/failure
+ */
+signed int s_break(int sec_stay, int sec_post)
+{
+	int ret = 0, ret1;
+
+	if (!fd) {
+		S_ERROR("terminal is not open!\n");
+		return SERIAL_FAILED;
+	}
+
+	ret = ioctl(fd, TIOCSBRK);
+	if (ret < 0)
+		return ret;
+	if (sec_stay)
+		sleep(sec_stay);
+	ret = ioctl(fd,TIOCCBRK);
+	if (ret < 0)
+		return ret;
+	if (sec_post)
+		sleep(sec_post);
+}
+

@@ -411,6 +411,19 @@ signed int s_putc(char x)
 	return x;
 }
 
+/**
+ * @brief s_break - Send a break event
+ *
+ * @param sec_stay: how long to keep the break condition?
+ * @param sec_post: how long to wait after break?
+ *
+ * @return success/failure
+ */
+signed int s_break(int sec_stay, int sec_post)
+{
+	return SERIAL_FAILED;
+}
+
 /**************** HELPERS ****************/
 
 /**
