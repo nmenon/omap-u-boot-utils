@@ -53,6 +53,7 @@ LIB_FILES+=lib/f_status.c lib/lcfg/lcfg_static.c
 
 #App source code
 PSERIAL_FILES=src/pserial.c
+SYSRQ_FILES=src/sysrq.c
 KERMIT_FILES=src/ukermit.c
 UCMD_FILES=src/ucmd.c
 PUSB_FILES=src/pusb.c
@@ -66,6 +67,7 @@ DOCS=docs/html docs/latex
 
 # Final output files
 PSERIAL_EXE=pserial$(EXE_PREFIX)
+SYSRQ_EXE=sysrq$(EXE_PREFIX)
 KERMIT_EXE=ukermit$(EXE_PREFIX)
 UCMD_EXE=ucmd$(EXE_PREFIX)
 PUSB_EXE=pusb$(EXE_PREFIX)
@@ -74,6 +76,7 @@ TAGGER_EXE=tagger$(EXE_PREFIX)
 
 # Object Files
 PSERIAL_OBJ=$(PSERIAL_FILES:.c=.o)
+SYSRQ_OBJ=$(SYSRQ_FILES:.c=.o)
 KERMIT_OBJ=$(KERMIT_FILES:.c=.o)
 UCMD_OBJ=$(UCMD_FILES:.c=.o)
 PUSB_OBJ=$(PUSB_FILES:.c=.o)
@@ -87,7 +90,7 @@ STY_BINS=$(STY_FILES:.S=.bin)
 CLEANUPFILES=$(PSERIAL_OBJ) $(LIB_OBJ) $(PSERIAL_EXE) $(GWART_OBJ)\
 			 $(KERMIT_EXE) $(KERMIT_OBJ) $(UCMD_OBJ) $(UCMD_EXE)\
 			 $(PUSB_EXE) $(PUSB_OBJ) $(GPSIGN_EXE) $(GPSIGN_OBJ)\
-			 $(TAGGER_EXE) $(TAGGER_OBJ) $(STY_OBJS)
+			 $(TAGGER_EXE) $(TAGGER_OBJ) $(STY_OBJS) $(SYSRQ_OBJ)
 
 CC=$(COMPILER_PREFIX)gcc
 LD=$(COMPILER_PREFIX)gcc
@@ -131,12 +134,17 @@ endif
 
 .PHONY : all
 
-all: $(PSERIAL_EXE) $(KERMIT_EXE) $(UCMD_EXE) $(GPSIGN_EXE) $(TAGGER_EXE)
+all: $(PSERIAL_EXE) $(KERMIT_EXE) $(UCMD_EXE) $(GPSIGN_EXE) $(TAGGER_EXE) $(SYSRQ_EXE)
 
 usb: $(PUSB_EXE)
 
 sty: $(STY_BINS)
 	@$(ECHO) "Completed all sty files"
+
+$(SYSRQ_EXE): $(SYSRQ_OBJ) $(LIB_OBJ) makefile
+	@$(ECHO) "Generating:  $@"
+	$(if $(VERBOSE:1=),@)$(LD) $(SYSRQ_OBJ) $(LIB_OBJ) $(LDFLAGS) -o $@
+	@$(ECHO)
 
 $(PSERIAL_EXE): $(PSERIAL_OBJ) $(LIB_OBJ) makefile
 	@$(ECHO) "Generating:  $@"
