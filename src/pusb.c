@@ -199,11 +199,13 @@ int send_file(libusb_device_handle *udev, char *f_name)
 			i++;
 		}
 	}
+	usb_sleep(50);
 	/* Send the  Continue Peripheral boot command */
 	if (send_command(udev, DOWNLOAD_COMMAND)) {
 		fail = -1;
 		goto closeup;
 	}
+	usb_sleep(50);
 	/* Send in the filesize */
 	r =
 	    libusb_bulk_transfer(udev, DEVICE_OUT_ENDPOINT, (unsigned char *)&filesize,
