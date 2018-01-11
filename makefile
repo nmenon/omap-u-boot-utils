@@ -102,7 +102,11 @@ CFLAGS=-Wall -O3 -Iinclude -Ilib/lcfg
 LDFLAGS=
 
 CFLAGS+=-fdata-sections -ffunction-sections
+ifeq ($(HOSTOS),darwin)
+LDFLAGS+=-Wl,-dead_strip
+else
 LDFLAGS+=-Wl,--gc-sections -Wl,--print-gc-sections -Wl,--no-print-gc-sections
+endif
 # should usually produce -lusb-1.0
 LDFLAGS_USB=`pkg-config libusb-1.0 --libs`
 
